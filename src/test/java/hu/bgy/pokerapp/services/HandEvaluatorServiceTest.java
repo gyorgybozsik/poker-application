@@ -22,12 +22,12 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @SpringBootTest
-public class HandEvaluatorTest {
-    private final HandEvaluator handEvaluator = new HandEvaluator();
+public class HandEvaluatorServiceTest {
+    private final HandEvaluatorService handEvaluatorService = new HandEvaluatorService();
 
     public static Stream<Arguments> fromInvalidMethod() {
         return Stream.of(
-                Arguments.of(of(card(HEARTH, QUEEN), card(HEARTH, JACK), card(HEARTH, TEN), card(HEARTH, NINE), card(HEARTH, EIGHT), card(HEARTH, FIVE))),
+                Arguments.of(of(card(HEARTH, QUEEN), card(HEARTH, JACK), card(HEARTH, TEN), card(HEARTH, NINE))),
                 Arguments.of(of(card(HEARTH, TEN))),
                 Arguments.of(of(card(HEARTH, TEN), card(HEARTH, JACK)))
         );
@@ -62,19 +62,19 @@ public class HandEvaluatorTest {
     @ParameterizedTest
     @MethodSource(value = "fromInvalidMethod")
     void testDifferentHandsWithInvalidInputs(final Set<Card> cards) {
-        assertThrows(IllegalArgumentException.class, () -> handEvaluator.evaluate(hand(cards)));
+        assertThrows(IllegalArgumentException.class, () -> handEvaluatorService.evaluate(hand(cards)));
     }
 
     @ParameterizedTest
     @MethodSource(value = "fromValidMethod")
     void testDifferentHandsWithValidInputs(final Value expected, final Set<Card> cards) {
-        assertEquals(expected, handEvaluator.evaluate(hand(cards)));
+        assertEquals(expected, handEvaluatorService.evaluate(hand(cards)));
     }
 
     @ParameterizedTest
     @NullAndEmptySource
     void testDifferentHands(final Set<Card> cards) {
-        assertThrows(IllegalArgumentException.class, () -> handEvaluator.evaluate(new Hand(cards)));
+        assertThrows(IllegalArgumentException.class, () -> handEvaluatorService.evaluate(new Hand(cards)));
     }
 
     private static Card card(final Symbol symbol, final Rank rank) {

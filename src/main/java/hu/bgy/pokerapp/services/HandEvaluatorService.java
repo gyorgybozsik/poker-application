@@ -6,7 +6,7 @@ import hu.bgy.pokerapp.models.Hand;
 import static hu.bgy.pokerapp.enums.Value.values;
 import static java.util.Arrays.stream;
 
-public class HandEvaluator {
+public class HandEvaluatorService {
     public Value evaluate(final Hand hand) {
         if (hand == null) {
             throw new IllegalArgumentException();

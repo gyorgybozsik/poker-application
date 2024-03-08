@@ -65,7 +65,7 @@ public class Hand {
     }
 
     public void validate() {
-        if (isEmpty(cards) || cards.size() != 5) {
+        if (isEmpty(cards) || cards.size() < 5) {
             throw new IllegalArgumentException();
         }
     }

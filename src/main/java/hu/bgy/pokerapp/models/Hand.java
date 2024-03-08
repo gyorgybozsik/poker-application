@@ -4,13 +4,10 @@ import hu.bgy.pokerapp.enums.Rank;
 import hu.bgy.pokerapp.enums.Symbol;
 import lombok.Getter;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
+import java.util.stream.Collectors;
 
 import static hu.bgy.pokerapp.enums.Rank.ACE;
-import static java.util.stream.IntStream.range;
 import static org.springframework.util.CollectionUtils.isEmpty;
 
 @Getter
@@ -19,6 +16,7 @@ public class Hand {
 
     private final Map<Rank, Integer> ranks = new HashMap<>(5);
     private final Map<Symbol, Integer> symbols = new HashMap<>(4);
+    private final Map<Symbol, List<Rank>> rankBySymbols = new HashMap<>(4);
 
     private final int numberOfPairs;
     private final boolean drill;
@@ -33,13 +31,26 @@ public class Hand {
 
         fillRanks();
         fillSymbols();
-
+        fillRankBySymbols();
         this.numberOfPairs = fillNumberOfPairs();
         this.drill = fillDrill();
         this.quad = fillQuad();
         this.straight = fillStraight();
         this.flush = fillFlush();
         this.highest = fillHighest();
+    }
+
+    private void fillRankBySymbols() {
+        for (Card card : cards) {
+            if (rankBySymbols.containsKey(card.symbol())) {
+                final List<Rank> ranks = rankBySymbols.get(card.symbol());
+                ranks.add(card.rank());
+            } else {
+                final List<Rank> ranks = new ArrayList<>();
+                ranks.add(card.rank());
+                rankBySymbols.put(card.symbol(), ranks);
+            }
+        }
     }
 
     private void fillRanks() {
@@ -91,27 +102,41 @@ public class Hand {
     }
 
     private boolean fillStraight() {
-        final List<Integer> values = cards.stream()
-                .map(Card::rank)
-                .map(Enum::ordinal)
-                .sorted()
-                .toList();
-
-        return range(0, values.size() - 1)
-                .noneMatch(i -> values.get(i + 1) - values.get(i) != 1);
+        // final List<Integer> values = cards.stream()
+        //         .map(Card::rank)
+        //         .map(Enum::ordinal)
+        //         .sorted()
+        //         .toList();
+        final List<Rank> ranks = cards.stream().map(Card::rank).collect(Collectors.toSet()).stream().sorted().toList();
+        for (int i = 0; i < ranks.size() - 4; i++) {
+            if (ranks.get(i).distance(ranks.get(i + 4)) == 4) return true;
+        }
+        return false;
     }
+
 
     private boolean fillFlush() {
         return symbols.values()
                 .stream()
                 .max(Integer::compareTo)
-                .orElse(0)
-                .equals(5);
+                .orElse(0) > 4;
     }
 
     private boolean fillHighest() {
         return cards.stream()
                 .map(Card::rank)
                 .anyMatch(a -> a == ACE);
+    }
+
+    public boolean isStraitFlush() {
+        for (List<Rank> ranks : rankBySymbols.values()) {
+            if (ranks.size() >= 5) {
+                ranks.sort(null);
+            }
+            for (int i = 0; i < ranks.size() - 4; i++) {
+                if (ranks.get(i).distance(ranks.get(i + 4)) == 4) return true;
+            }
+        }
+        return false;
     }
 }

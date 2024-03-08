@@ -18,11 +18,12 @@ public class HandEvaluatorService {
     }
 
     private boolean isMatch(final Value value, final Hand hand) {
-        return value.getNumberOfPairs() == hand.getNumberOfPairs() &&
-                value.isDrill() == hand.isDrill() &&
-                value.isQuad() == hand.isQuad() &&
-                value.isStraight() == hand.isStraight() &&
-                value.isFlush() == hand.isFlush() &&
+        return (value.getNumberOfPairs() != 0 ? value.getNumberOfPairs() == hand.getNumberOfPairs() : true) &&
+                (value.isDrill() ? hand.isDrill() : true) &&
+                (value.isQuad() ? hand.isQuad() : true) &&
+                (value.isStraight() ? hand.isStraight() : true) &&
+                (value.isFlush() ? hand.isFlush() : true) &&
+                (value.isStraight() && value.isFlush() ? hand.isStraitFlush() : true) &&
                 (!value.isHighest() || hand.isHighest());
     }
 }

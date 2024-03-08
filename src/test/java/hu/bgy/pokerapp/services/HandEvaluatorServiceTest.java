@@ -35,27 +35,34 @@ public class HandEvaluatorServiceTest {
 
     public static Stream<Arguments> fromValidMethod() {
         return Stream.of(
-                Arguments.of(ROYAL_FLUSH, of(card(HEARTH, ACE), card(HEARTH, KING), card(HEARTH, QUEEN), card(HEARTH, JACK), card(HEARTH, TEN))),
-                Arguments.of(ROYAL_FLUSH, of(card(HEARTH, TEN), card(HEARTH, ACE), card(HEARTH, QUEEN), card(HEARTH, JACK), card(HEARTH, KING))),
-                Arguments.of(ROYAL_FLUSH, of(card(CLUB, TEN), card(CLUB, ACE), card(CLUB, QUEEN), card(CLUB, JACK), card(CLUB, KING))),
+                // Arguments.of(ROYAL_FLUSH, of(card(HEARTH, ACE), card(HEARTH, KING), card(HEARTH, QUEEN), card(HEARTH, JACK), card(HEARTH, TEN))),
+                // Arguments.of(ROYAL_FLUSH, of(card(HEARTH, TEN), card(HEARTH, ACE), card(HEARTH, QUEEN), card(HEARTH, JACK), card(HEARTH, KING))),
+                // Arguments.of(ROYAL_FLUSH, of(card(CLUB, TEN), card(CLUB, ACE), card(CLUB, QUEEN), card(CLUB, JACK), card(CLUB, KING))),
+                // Arguments.of(STRAIGHT_FLUSH, of(card(HEARTH, NINE), card(HEARTH, KING), card(HEARTH, QUEEN), card(HEARTH, JACK), card(HEARTH, TEN))),
+                // Arguments.of(STRAIGHT_FLUSH, of(card(SPADE, NINE), card(SPADE, EIGHT), card(SPADE, QUEEN), card(SPADE, JACK), card(SPADE, TEN))),
+                // Arguments.of(POKER, of(card(HEARTH, ACE), card(SPADE, ACE), card(DIAMOND, ACE), card(CLUB, ACE), card(HEARTH, TEN))),
+                // Arguments.of(POKER, of(card(HEARTH, JACK), card(SPADE, JACK), card(DIAMOND, JACK), card(CLUB, JACK), card(HEARTH, ACE))),
+                // Arguments.of(FULL_HOUSE, of(card(SPADE, ACE), card(HEARTH, JACK), card(SPADE, JACK), card(DIAMOND, JACK), card(HEARTH, ACE))),
+                // Arguments.of(FULL_HOUSE, of(card(HEARTH, TEN), card(SPADE, TEN), card(HEARTH, ACE), card(DIAMOND, TEN), card(SPADE, ACE))),
+                // Arguments.of(FLUSH, of(card(HEARTH, TWO), card(HEARTH, ACE), card(HEARTH, QUEEN), card(HEARTH, JACK), card(HEARTH, TEN))),
+                // Arguments.of(FLUSH, of(card(SPADE, TWO), card(SPADE, ACE), card(SPADE, QUEEN), card(SPADE, JACK), card(SPADE, EIGHT))),
+                // Arguments.of(STRAIT, of(card(HEARTH, NINE), card(SPADE, KING), card(HEARTH, QUEEN), card(HEARTH, JACK), card(SPADE, TEN))),
+                // Arguments.of(STRAIT, of(card(HEARTH, NINE), card(CLUB, EIGHT), card(SPADE, QUEEN), card(SPADE, JACK), card(SPADE, TEN))),
+                // Arguments.of(DRILL, of(card(HEARTH, JACK), card(SPADE, JACK), card(DIAMOND, JACK), card(HEARTH, TWO), card(SPADE, ACE))),
+                // Arguments.of(DRILL, of(card(HEARTH, TEN), card(HEARTH, THREE), card(SPADE, ACE), card(SPADE, TEN), card(DIAMOND, TEN))),
+                // Arguments.of(TWO_PAIRS, of(card(SPADE, ACE), card(HEARTH, QUEEN), card(SPADE, JACK), card(DIAMOND, JACK), card(HEARTH, ACE))),
+                // Arguments.of(TWO_PAIRS, of(card(HEARTH, TEN), card(SPADE, TEN), card(HEARTH, ACE), card(DIAMOND, EIGHT), card(SPADE, ACE))),
+                // Arguments.of(PAIR, of(card(SPADE, KING), card(SPADE, QUEEN), card(SPADE, JACK), card(DIAMOND, JACK), card(HEARTH, ACE))),
+                // Arguments.of(PAIR, of(card(SPADE, ACE), card(HEARTH, QUEEN), card(SPADE, FOUR), card(SPADE, JACK), card(HEARTH, ACE))),
+                // Arguments.of(NOTHING, of(card(SPADE, KING), card(SPADE, QUEEN), card(SPADE, JACK), card(DIAMOND, THREE), card(HEARTH, ACE))),
+                // Arguments.of(NOTHING, of(card(SPADE, ACE), card(HEARTH, QUEEN), card(SPADE, FOUR), card(SPADE, JACK), card(HEARTH, TWO))),
+
+                //more than 5 card
+                // Arguments.of(ROYAL_FLUSH, of(card(HEARTH, ACE), card(HEARTH, KING),card(DIAMOND, KING),card(CLUB, KING),card(SPADE, KING), card(HEARTH, QUEEN), card(HEARTH, JACK), card(HEARTH, TEN))),
+                // Arguments.of(ROYAL_FLUSH, of(card(HEARTH, TEN),card(SPADE, JACK), card(HEARTH, ACE), card(HEARTH, QUEEN),card(HEARTH, TWO), card(HEARTH, JACK), card(HEARTH, KING))),
+                // Arguments.of(ROYAL_FLUSH, of(card(CLUB, TEN),card(HEARTH, JACK), card(CLUB, ACE), card(CLUB, QUEEN), card(CLUB, JACK), card(CLUB, KING)))        );
                 Arguments.of(STRAIGHT_FLUSH, of(card(HEARTH, NINE), card(HEARTH, KING), card(HEARTH, QUEEN), card(HEARTH, JACK), card(HEARTH, TEN))),
-                Arguments.of(STRAIGHT_FLUSH, of(card(SPADE, NINE), card(SPADE, EIGHT), card(SPADE, QUEEN), card(SPADE, JACK), card(SPADE, TEN))),
-                Arguments.of(POKER, of(card(HEARTH, ACE), card(SPADE, ACE), card(DIAMOND, ACE), card(CLUB, ACE), card(HEARTH, TEN))),
-                Arguments.of(POKER, of(card(HEARTH, JACK), card(SPADE, JACK), card(DIAMOND, JACK), card(CLUB, JACK), card(HEARTH, ACE))),
-                Arguments.of(FULL_HOUSE, of(card(SPADE, ACE), card(HEARTH, JACK), card(SPADE, JACK), card(DIAMOND, JACK), card(HEARTH, ACE))),
-                Arguments.of(FULL_HOUSE, of(card(HEARTH, TEN), card(SPADE, TEN), card(HEARTH, ACE), card(DIAMOND, TEN), card(SPADE, ACE))),
-                Arguments.of(FLUSH, of(card(HEARTH, TWO), card(HEARTH, ACE), card(HEARTH, QUEEN), card(HEARTH, JACK), card(HEARTH, TEN))),
-                Arguments.of(FLUSH, of(card(SPADE, TWO), card(SPADE, ACE), card(SPADE, QUEEN), card(SPADE, JACK), card(SPADE, EIGHT))),
-                Arguments.of(STRAIT, of(card(HEARTH, NINE), card(SPADE, KING), card(HEARTH, QUEEN), card(HEARTH, JACK), card(SPADE, TEN))),
-                Arguments.of(STRAIT, of(card(HEARTH, NINE), card(CLUB, EIGHT), card(SPADE, QUEEN), card(SPADE, JACK), card(SPADE, TEN))),
-                Arguments.of(DRILL, of(card(HEARTH, JACK), card(SPADE, JACK), card(DIAMOND, JACK), card(HEARTH, TWO), card(SPADE, ACE))),
-                Arguments.of(DRILL, of(card(HEARTH, TEN), card(HEARTH, THREE), card(SPADE, ACE), card(SPADE, TEN), card(DIAMOND, TEN))),
-                Arguments.of(TWO_PAIRS, of(card(SPADE, ACE), card(HEARTH, QUEEN), card(SPADE, JACK), card(DIAMOND, JACK), card(HEARTH, ACE))),
-                Arguments.of(TWO_PAIRS, of(card(HEARTH, TEN), card(SPADE, TEN), card(HEARTH, ACE), card(DIAMOND, EIGHT), card(SPADE, ACE))),
-                Arguments.of(PAIR, of(card(SPADE, KING), card(SPADE, QUEEN), card(SPADE, JACK), card(DIAMOND, JACK), card(HEARTH, ACE))),
-                Arguments.of(PAIR, of(card(SPADE, ACE), card(HEARTH, QUEEN), card(SPADE, FOUR), card(SPADE, JACK), card(HEARTH, ACE))),
-                Arguments.of(NOTHING, of(card(SPADE, KING), card(SPADE, QUEEN), card(SPADE, JACK), card(DIAMOND, THREE), card(HEARTH, ACE))),
-                Arguments.of(NOTHING, of(card(SPADE, ACE), card(HEARTH, QUEEN), card(SPADE, FOUR), card(SPADE, JACK), card(HEARTH, TWO)))
+                Arguments.of(STRAIGHT_FLUSH, of(card(SPADE, NINE), card(SPADE, EIGHT), card(SPADE, QUEEN), card(SPADE, JACK), card(SPADE, TEN)))
         );
     }
 

@@ -1,5 +1,7 @@
 package hu.bgy.pokerapp.enums;
 
+import lombok.NonNull;
+
 public enum Rank {
     ACE,
     KING,
@@ -15,4 +17,8 @@ public enum Rank {
     THREE,
     TWO,
     ;
+
+    public int distance(@NonNull final Rank rank){
+        return Math.abs(ordinal() - rank.ordinal());
+    }
 }

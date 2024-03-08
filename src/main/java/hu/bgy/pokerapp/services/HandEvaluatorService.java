@@ -23,7 +23,6 @@ public class HandEvaluatorService {
                 (value.isQuad() ? hand.isQuad() : true) &&
                 (value.isStraight() ? hand.isStraight() : true) &&
                 (value.isFlush() ? hand.isFlush() : true) &&
-                (value.isStraight() && value.isFlush() ? hand.isStraitFlush() : true) &&
-                (!value.isHighest() || hand.isHighest());
+                (value.isStraight() && value.isFlush() ? hand.isRoyalOrStraitFlush(value.isHighest()) : true);
     }
 }

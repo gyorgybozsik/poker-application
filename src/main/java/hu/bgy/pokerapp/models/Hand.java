@@ -128,15 +128,27 @@ public class Hand {
                 .anyMatch(a -> a == ACE);
     }
 
-    public boolean isStraitFlush() {
-        for (List<Rank> ranks : rankBySymbols.values()) {
-            if (ranks.size() >= 5) {
-                ranks.sort(null);
-            }
-            for (int i = 0; i < ranks.size() - 4; i++) {
-                if (ranks.get(i).distance(ranks.get(i + 4)) == 4) return true;
+    public boolean isRoyalOrStraitFlush(final boolean highestNeeded) {
+        return rankBySymbols.values()
+                .stream()
+                .anyMatch(ranks -> extracted(highestNeeded, ranks));
+    }
+
+    private static boolean extracted(boolean highestNeeded, List<Rank> ranks) {
+        if (ranks.size() >= 5) {
+            ranks.sort(null);
+        }
+        for (int i = 0; i < ranks.size() - 4; i++) {
+            if (ranks.get(i).distance(ranks.get(i + 4)) == 4) {
+                if (highestNeeded && ACE.equals(ranks.get(i))) {
+                    return true;
+                } else if (!highestNeeded){
+                    return true;
+                }
             }
         }
         return false;
     }
+
 }
+

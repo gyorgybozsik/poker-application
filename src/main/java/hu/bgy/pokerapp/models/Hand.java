@@ -3,13 +3,14 @@ package hu.bgy.pokerapp.models;
 import hu.bgy.pokerapp.enums.Rank;
 import hu.bgy.pokerapp.enums.Symbol;
 import lombok.Getter;
-import lombok.extern.slf4j.Slf4j;
+import lombok.NonNull;
 
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import static hu.bgy.pokerapp.enums.Rank.ACE;
+import static hu.bgy.pokerapp.enums.Rank.TWO;
 import static org.springframework.util.CollectionUtils.isEmpty;
 
 @Getter
@@ -18,7 +19,7 @@ public class Hand {
 
     private final Map<Rank, Integer> ranks = new HashMap<>(5);
     private final Map<Symbol, Integer> symbols = new HashMap<>(4);
-    private final Map<Symbol, List<Rank>> rankBySymbols = new HashMap<>(4);
+    private final Map<Symbol, TreeSet<Rank>> rankBySymbols = new HashMap<>(4);
     //  <multiplications size, pieces>
     private final Map<Integer, Long> rankOccurrences;
 
@@ -50,10 +51,10 @@ public class Hand {
     private void fillRankBySymbols() {
         for (Card card : cards) {
             if (rankBySymbols.containsKey(card.symbol())) {
-                final List<Rank> ranks = rankBySymbols.get(card.symbol());
+                final TreeSet<Rank> ranks = rankBySymbols.get(card.symbol());
                 ranks.add(card.rank());
             } else {
-                final List<Rank> ranks = new ArrayList<>();
+                final TreeSet<Rank> ranks = new TreeSet<>();
                 ranks.add(card.rank());
                 rankBySymbols.put(card.symbol(), ranks);
             }
@@ -141,13 +142,11 @@ public class Hand {
                 .anyMatch(ranks -> extracted(highestNeeded, ranks));
     }
 
-    private static boolean extracted(boolean highestNeeded, List<Rank> ranks) {
-        if (ranks.size() >= 5) {
-            ranks.sort(null);
-        }
+    private static boolean extracted(final boolean highestNeeded, final TreeSet<Rank> ranks) {
+        final List<Rank> rankList = ranks.stream().toList();
         for (int i = 0; i < ranks.size() - 4; i++) {
-            if (ranks.get(i).distance(ranks.get(i + 4)) == 4) {
-                if (highestNeeded && ACE.equals(ranks.get(i))) {
+            if (rankList.get(i).distance(rankList.get(i + 4)) == 4) {
+                if (highestNeeded && ACE.equals(rankList.get(i))) {
                     return true;
                 } else if (!highestNeeded) {
                     return true;
@@ -178,5 +177,106 @@ public class Hand {
         final int occurrencesHigherThanOne = (int) rankOccurrences.entrySet().stream().filter(entry -> entry.getKey() > 1).count();
         return !flush && !straight && occurrencesHigherThanOne == 0;
     }
-}
 
+    public Set<TreeSet<Card>> getRoyalOrStraightFlush(final boolean highest) {
+        final Set<TreeSet<Card>> highestHands = rankBySymbols.entrySet()
+                .stream()
+                .filter(entry -> entry.getValue().size() >= 5)
+                .map(entry -> findRoyalFlushIfExists(entry.getKey(), entry.getValue()))
+                .collect(Collectors.toSet());
+
+        final Rank highestRank = highest ?
+                Rank.getHighest() :
+                highestHands.stream()
+                        .map(SortedSet::getFirst)
+                        .map(Card::rank)
+                        .max(Comparator.naturalOrder())
+                        .orElseThrow(IllegalArgumentException::new);
+
+        return highestHands.stream()
+                .filter(set -> !set.isEmpty())
+                .filter(cards -> cards.getFirst().isEqual(highestRank))
+                .collect(Collectors.toSet());
+    }
+
+    public Set<TreeSet<Card>> getRoyalOrStraightFlush2(final boolean highest) {
+        final Set<TreeSet<Card>> highestHands = new HashSet<>();
+        for (Map.Entry<Symbol, TreeSet<Rank>> entry : rankBySymbols.entrySet()) {
+            if (entry.getValue().size() < 5) {
+                continue;
+            }
+            final TreeSet<Card> highestHand = findRoyalFlushIfExists(entry.getKey(), entry.getValue());
+            handleHighestHand(highestHand, highestHands, highest);
+        }
+        return highestHands;
+    }
+
+    private void handleHighestHand(
+            @NonNull final TreeSet<Card> highestHand, // amit most találunk sínek alapják kéz
+            @NonNull final Set<TreeSet<Card>> highestHands, // ez amit előző iterációkba találtuunk kezek listája
+            final boolean highest) {
+        if (highestHand.isEmpty()) { // ha a mostani lisrta ures akkor nem csinálunk semmit. mert nem találtunk sort
+            return;
+        }
+        if (highestHands.isEmpty()) { // ha az előző találatok litája üres
+            if (highest && highestHand.getFirst().isHighest()) { // itt kezeljük el az első találatot Royal Flush esetén
+                highestHands.add(highestHand);
+            } else if (!highest) { // itt kezeljük el az első találatot Straight Flush esetén
+                highestHands.add(highestHand);
+            }
+            return;
+        }
+
+        if (highest && highestHand.getFirst().isHighest()) {
+            highestHands.add(highestHand);
+            return;
+        }
+
+        if (!highest) {
+            final Rank previousHighest = highestHands
+                    .stream()
+                    .findFirst()
+                    .orElseThrow(IllegalArgumentException::new)
+                    .getFirst()
+                    .rank();
+            final Rank currentHighest = highestHand
+                    .getFirst()
+                    .rank();
+            if (currentHighest.isHigher(previousHighest)) {
+                highestHands.clear();
+                highestHands.add(highestHand);
+            } else if (!previousHighest.isHigher(currentHighest)) {
+                highestHands.add(highestHand);
+            }
+        }
+    }
+
+    private TreeSet<Card> findRoyalFlushIfExists(
+            @NonNull final Symbol symbol,
+            @NonNull final TreeSet<Rank> ranks) {
+        final List<Rank> rankList = ranks.stream().toList();
+        for (int i = 0; i < rankList.size() - 4; i++) {
+            if (rankList.get(i).distance(rankList.get(i + 4)) == 4) {
+                return collectCards(symbol, rankList.subList(i, i + 5));
+            }
+        }
+        return new TreeSet<>();
+    }
+
+    private @NonNull TreeSet<Card> collectCards(
+            @NonNull final Symbol symbol,
+            @NonNull final List<Rank> ranks) {
+        return ranks.stream()
+                .map(rank -> getCard(symbol, rank))
+                .collect(Collectors.toCollection(TreeSet::new));
+    }
+
+    private @NonNull Card getCard(
+            @NonNull final Symbol symbol,
+            @NonNull final Rank rank) {
+        return cards.stream()
+                .filter(card -> card.rank() == rank && card.symbol() == symbol)
+                .findFirst()
+                .orElseThrow(IllegalArgumentException::new);
+    }
+}

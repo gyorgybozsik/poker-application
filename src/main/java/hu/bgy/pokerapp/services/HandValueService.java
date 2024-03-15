@@ -7,8 +7,10 @@ import lombok.NonNull;
 import org.springframework.lang.Nullable;
 
 import java.util.Set;
+import java.util.TreeSet;
 
 public interface HandValueService {
     @NonNull Value evaluate(@Nullable final Hand hand);
-    @NonNull Set<Card> getHand(@NonNull final Hand hand);
+    @NonNull Set<TreeSet<Card>> getHandBasedOnValue(@NonNull final Value value, @NonNull final Hand hand);
+    @NonNull Set<Card> getValuesHand(@NonNull final Hand hand);
 }

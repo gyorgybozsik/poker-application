@@ -7,6 +7,7 @@ import lombok.NonNull;
 import org.springframework.lang.Nullable;
 
 import java.util.Set;
+import java.util.TreeSet;
 
 import static hu.bgy.pokerapp.enums.Value.values;
 import static java.util.Arrays.stream;
@@ -23,8 +24,28 @@ public class HandValueServiceImpl implements HandValueService {
     }
 
     @Override
-    public @NonNull Set<Card> getHand(@NonNull final Hand hand) {
-        return null;
+    public @NonNull Set<Card> getValuesHand(@NonNull final Hand hand) {
+        final Value value = evaluate(hand);
+        final Set<TreeSet<Card>> hands = getHandBasedOnValue(value, hand);
+        return hands.stream()
+                .findFirst()
+                .orElseThrow(IllegalArgumentException::new);
+    }
+
+    @Override
+    public @NonNull Set<TreeSet<Card>> getHandBasedOnValue(@NonNull final Value value, @NonNull final Hand hand) {
+        return switch (value){
+            case ROYAL_FLUSH -> hand.getRoyalOrStraightFlush(true);
+            case STRAIGHT_FLUSH -> null;
+            case POKER -> null;
+            case FULL_HOUSE -> null;
+            case FLUSH -> null;
+            case STRAIGHT -> null;
+            case DRILL -> null;
+            case TWO_PAIRS -> null;
+            case PAIR -> null;
+            case NOTHING -> null;
+        };
     }
 
     private boolean isMatch(final Value value, final Hand hand) {

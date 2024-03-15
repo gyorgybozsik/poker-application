@@ -12,6 +12,7 @@ import org.junit.jupiter.params.provider.NullAndEmptySource;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import java.util.Set;
+import java.util.TreeSet;
 import java.util.stream.Stream;
 
 import static hu.bgy.pokerapp.enums.Rank.*;
@@ -25,7 +26,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 public class HandValueServiceImplTest {
     private final HandValueService handValueService = new HandValueServiceImpl();
 
-    public static Stream<Arguments> fromInvalidMethod() {
+    public static Stream<Arguments> invalidValueTest() {
         return Stream.of(
                 Arguments.of(of(card(HEARTH, QUEEN), card(HEARTH, JACK), card(HEARTH, TEN), card(HEARTH, NINE))),
                 Arguments.of(of(card(HEARTH, TEN))),
@@ -33,7 +34,7 @@ public class HandValueServiceImplTest {
         );
     }
 
-    public static Stream<Arguments> fromValidMethod() {
+    public static Stream<Arguments> validValueTest() {
         return Stream.of(
                 Arguments.of(ROYAL_FLUSH, of(card(HEARTH, ACE), card(HEARTH, KING), card(HEARTH, QUEEN), card(HEARTH, JACK), card(HEARTH, TEN))),
                 Arguments.of(ROYAL_FLUSH, of(card(HEARTH, TEN), card(HEARTH, ACE), card(HEARTH, QUEEN), card(HEARTH, JACK), card(HEARTH, KING))),
@@ -86,16 +87,49 @@ public class HandValueServiceImplTest {
         );
     }
 
+    public static Stream<Arguments> getTest() {
+        return Stream.of(
+                Arguments.of(
+                        of(
+                                of(card(SPADE, ACE), card(SPADE, JACK), card(SPADE, TEN), card(SPADE, QUEEN), card(SPADE, KING)),
+                                of(card(DIAMOND, KING), card(DIAMOND, QUEEN), card(DIAMOND, TEN), card(DIAMOND, ACE), card(DIAMOND, JACK))),
+                        ROYAL_FLUSH,
+                        of(card(SPADE, ACE), card(SPADE, JACK), card(DIAMOND, KING), card(DIAMOND, QUEEN), card(SPADE, TEN),
+                                card(SPADE, QUEEN), card(SPADE, KING), card(DIAMOND, TEN), card(DIAMOND, ACE), card(DIAMOND, JACK),
+                                card(CLUB, ACE), card(HEARTH, TWO),
+                                card(SPADE, FOUR), card(SPADE, SEVEN), card(SPADE, FIVE), card(SPADE, EIGHT), card(SPADE, SIX),
+                                card(CLUB, TEN), card(CLUB, SEVEN), card(CLUB, NINE), card(CLUB, QUEEN))
+
+                )
+        );
+    }
+    /*
+            Arguments.of(card(SPADE, ACE), card(SPADE, JACK), card(SPADE, TEN), card(SPADE, QUEEN), card(SPADE, KING),
+    card(DIAMOND, KING), card(DIAMOND, QUEEN), card(DIAMOND, TEN), card(DIAMOND, ACE), card(DIAMOND, JACK)),
+    ROYAL_FLUSH,
+    of (card(SPADE, ACE), card(SPADE, JACK), card(DIAMOND, KING), card(DIAMOND, QUEEN), card(SPADE, TEN),
+    card(SPADE, QUEEN), card(SPADE, KING), card(DIAMOND, TEN), card(DIAMOND, ACE), card(DIAMOND, JACK),
+    card(CLUB, ACE), card(HEARTH, TWO),
+    card(SPADE, FOUR), card(SPADE, SEVEN), card(SPADE, FIVE), card(SPADE, EIGHT), card(SPADE, SIX),
+    card(CLUB, TEN), card(CLUB, SEVEN), card(CLUB, NINE), card(CLUB, QUEEN)))
+            */
+
     @ParameterizedTest
-    @MethodSource(value = "fromInvalidMethod")
+    @MethodSource(value = "invalidValueTest")
     void testDifferentHandsWithInvalidInputs(final Set<Card> cards) {
         assertThrows(IllegalArgumentException.class, () -> handValueService.evaluate(hand(cards)));
     }
 
     @ParameterizedTest
-    @MethodSource(value = "fromValidMethod")
+    @MethodSource(value = "validValueTest")
     void testDifferentHandsWithValidInputs(final Value expected, final Set<Card> cards) {
         assertEquals(expected, handValueService.evaluate(hand(cards)));
+    }
+
+    @ParameterizedTest
+    @MethodSource(value = "getTest")
+    void testGetValue(final Set<TreeSet<Card>> expected, final Value value, final Set<Card> cards) {
+        assertEquals(expected, handValueService.getHandBasedOnValue(value, hand(cards)));
     }
 
     @ParameterizedTest

@@ -22,8 +22,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @SpringBootTest
-public class HandEvaluatorServiceTest {
-    private final HandEvaluatorService handEvaluatorService = new HandEvaluatorService();
+public class HandValueServiceImplTest {
+    private final HandValueService handValueService = new HandValueServiceImpl();
 
     public static Stream<Arguments> fromInvalidMethod() {
         return Stream.of(
@@ -89,19 +89,19 @@ public class HandEvaluatorServiceTest {
     @ParameterizedTest
     @MethodSource(value = "fromInvalidMethod")
     void testDifferentHandsWithInvalidInputs(final Set<Card> cards) {
-        assertThrows(IllegalArgumentException.class, () -> handEvaluatorService.evaluate(hand(cards)));
+        assertThrows(IllegalArgumentException.class, () -> handValueService.evaluate(hand(cards)));
     }
 
     @ParameterizedTest
     @MethodSource(value = "fromValidMethod")
     void testDifferentHandsWithValidInputs(final Value expected, final Set<Card> cards) {
-        assertEquals(expected, handEvaluatorService.evaluate(hand(cards)));
+        assertEquals(expected, handValueService.evaluate(hand(cards)));
     }
 
     @ParameterizedTest
     @NullAndEmptySource
     void testDifferentHands(final Set<Card> cards) {
-        assertThrows(IllegalArgumentException.class, () -> handEvaluatorService.evaluate(new Hand(cards)));
+        assertThrows(IllegalArgumentException.class, () -> handValueService.evaluate(new Hand(cards)));
     }
 
     private static Card card(final Symbol symbol, final Rank rank) {

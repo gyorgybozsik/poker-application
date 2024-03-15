@@ -24,12 +24,12 @@ public class HandEvaluatorService {
             case ROYAL_FLUSH, STRAIGHT_FLUSH -> checkRoyalOrStraightFlush(value, hand);
             case POKER -> hand.isQuad();
             case FULL_HOUSE -> checkFullHouse(hand);
-            case FLUSH -> false;
-            case STRAIT -> false;
-            case DRILL -> false;
-            case TWO_PAIRS -> false;
-            case PAIR -> false;
-            case NOTHING -> false;
+            case FLUSH -> hand.isFlush();
+            case STRAIGHT -> hand.isStraight();
+            case DRILL -> hand.isDrill();
+            case TWO_PAIRS -> hand.isTwoPair();
+            case PAIR -> hand.isPair();
+            case NOTHING -> hand.isNothing();
         };
         //return (value.getNumberOfPairs() != 0 ? value.getNumberOfPairs() == hand.getNumberOfPairs() : true) &&
         //        (value.isDrill() ? hand.isDrill() : true) &&

@@ -46,8 +46,8 @@ public class HandEvaluatorServiceTest {
                 Arguments.of(FULL_HOUSE, of(card(HEARTH, TEN), card(SPADE, TEN), card(HEARTH, ACE), card(DIAMOND, TEN), card(SPADE, ACE))),
                 Arguments.of(FLUSH, of(card(HEARTH, TWO), card(HEARTH, ACE), card(HEARTH, QUEEN), card(HEARTH, JACK), card(HEARTH, TEN))),
                 Arguments.of(FLUSH, of(card(SPADE, TWO), card(SPADE, ACE), card(SPADE, QUEEN), card(SPADE, JACK), card(SPADE, EIGHT))),
-                Arguments.of(STRAIT, of(card(HEARTH, NINE), card(SPADE, KING), card(HEARTH, QUEEN), card(HEARTH, JACK), card(SPADE, TEN))),
-                Arguments.of(STRAIT, of(card(HEARTH, NINE), card(CLUB, EIGHT), card(SPADE, QUEEN), card(SPADE, JACK), card(SPADE, TEN))),
+                Arguments.of(STRAIGHT, of(card(HEARTH, NINE), card(SPADE, KING), card(HEARTH, QUEEN), card(HEARTH, JACK), card(SPADE, TEN))),
+                Arguments.of(STRAIGHT, of(card(HEARTH, NINE), card(CLUB, EIGHT), card(SPADE, QUEEN), card(SPADE, JACK), card(SPADE, TEN))),
                 Arguments.of(DRILL, of(card(HEARTH, JACK), card(SPADE, JACK), card(DIAMOND, JACK), card(HEARTH, TWO), card(SPADE, ACE))),
                 Arguments.of(DRILL, of(card(HEARTH, TEN), card(HEARTH, THREE), card(SPADE, ACE), card(SPADE, TEN), card(DIAMOND, TEN))),
                 Arguments.of(TWO_PAIRS, of(card(SPADE, ACE), card(HEARTH, QUEEN), card(SPADE, JACK), card(DIAMOND, JACK), card(HEARTH, ACE))),
@@ -76,11 +76,12 @@ public class HandEvaluatorServiceTest {
                 Arguments.of(FULL_HOUSE, of(card(SPADE, TWO), card(HEARTH, TWO), card(HEARTH, TEN), card(CLUB, TWO), card(SPADE, TEN),
                         card(DIAMOND, THREE), card(CLUB, THREE), card(CLUB, QUEEN), card(DIAMOND, TEN), card(HEARTH, NINE),
                         card(CLUB, EIGHT), card(SPADE, KING), card(DIAMOND, KING), card(HEARTH, KING))),
-                Arguments.of(FULL_HOUSE, of(card(SPADE, TWO), card(HEARTH, TWO), card(HEARTH, TEN), card(CLUB, TWO), card(SPADE, TEN),
+                Arguments.of(FULL_HOUSE, of(card(SPADE, TWO), card(HEARTH, TWO),
+                        card(HEARTH, TEN), card(CLUB, TWO), card(SPADE, TEN),
                         card(CLUB, THREE), card(CLUB, QUEEN), card(DIAMOND, TEN))),
-                //Arguments.of(DRILL, of(card(SPADE, ACE), card(HEARTH, QUEEN), card(CLUB, QUEEN), card(HEARTH, FIVE), card(SPADE, QUEEN), card(DIAMOND, TEN))),
-                //Arguments.of(TWO_PAIRS, of(card(SPADE, ACE), card(HEARTH, ACE), card(HEARTH, QUEEN), card(HEARTH, TEN), card(SPADE, QUEEN), card(DIAMOND, TEN), card(CLUB, FOUR), card(CLUB, FIVE), card(DIAMOND, FOUR), card(SPADE, FIVE))),
-
+                Arguments.of(DRILL, of(card(SPADE, ACE), card(HEARTH, QUEEN), card(CLUB, QUEEN), card(HEARTH, FIVE), card(SPADE, QUEEN), card(DIAMOND, TEN))),
+                Arguments.of(TWO_PAIRS, of(card(SPADE, ACE), card(HEARTH, ACE), card(HEARTH, QUEEN), card(HEARTH, TEN), card(SPADE, QUEEN), card(DIAMOND, TEN), card(CLUB, FOUR), card(CLUB, FIVE), card(DIAMOND, FOUR), card(SPADE, FIVE))),
+                Arguments.of(PAIR, of(card(SPADE, ACE), card(HEARTH, QUEEN), card(HEARTH, TEN), card(CLUB, FOUR), card(DIAMOND, FOUR), card(SPADE, FIVE))),
                 Arguments.of(NOTHING, of(card(CLUB, FOUR), card(CLUB, TWO), card(CLUB, FIVE), card(DIAMOND, ACE), card(SPADE, TEN)))
         );
     }

@@ -13,7 +13,7 @@ public enum Value {
     POKER(0, false, true, false, false, false),
     FULL_HOUSE(1, true, false, false, false, false),
     FLUSH(0, false, false, false, true, false),
-    STRAIT(0, false, false, true, false, false),
+    STRAIGHT(0, false, false, true, false, false),
     DRILL(0, true, false, false, false, false),
     TWO_PAIRS(2, false, false, false, false, false),
     PAIR(1, false, false, false, false, false),

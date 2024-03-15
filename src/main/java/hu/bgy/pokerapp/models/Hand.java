@@ -3,6 +3,7 @@ package hu.bgy.pokerapp.models;
 import hu.bgy.pokerapp.enums.Rank;
 import hu.bgy.pokerapp.enums.Symbol;
 import lombok.Getter;
+import lombok.extern.slf4j.Slf4j;
 
 import java.util.*;
 import java.util.function.Function;
@@ -157,9 +158,25 @@ public class Hand {
     }
 
     public boolean isFullHouse() {
-        final int occurrencesHigherThanThree = (int) rankOccurrences.entrySet().stream().filter(entry -> entry.getKey() > 2).count();
+        final int occurrencesHigherThanThree = (int) rankOccurrences.entrySet()
+                .stream()
+                .filter(integerLongEntry -> integerLongEntry.getKey() > 2)
+                .mapToLong(Map.Entry::getValue).sum();
         final int occurrencesEqualTwo = (int) rankOccurrences.entrySet().stream().filter(entry -> entry.getKey() == 2).count();
         return occurrencesHigherThanThree >= 2 || (occurrencesHigherThanThree == 1 && occurrencesEqualTwo >= 1);
+    }
+
+    public boolean isTwoPair() {
+        return numberOfPairs >= 2;
+    }
+
+    public boolean isPair() {
+        return numberOfPairs == 1;
+    }
+
+    public boolean isNothing() {
+        final int occurrencesHigherThanOne = (int) rankOccurrences.entrySet().stream().filter(entry -> entry.getKey() > 1).count();
+        return !flush && !straight && occurrencesHigherThanOne == 0;
     }
 }
 

@@ -5,6 +5,7 @@ import hu.bgy.pokerapp.enums.Symbol;
 import lombok.Getter;
 
 import java.util.*;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import static hu.bgy.pokerapp.enums.Rank.ACE;
@@ -17,6 +18,8 @@ public class Hand {
     private final Map<Rank, Integer> ranks = new HashMap<>(5);
     private final Map<Symbol, Integer> symbols = new HashMap<>(4);
     private final Map<Symbol, List<Rank>> rankBySymbols = new HashMap<>(4);
+    //  <multiplications size, pieces>
+    private final Map<Integer, Long> rankOccurrences;
 
     private final int numberOfPairs;
     private final boolean drill;
@@ -32,6 +35,9 @@ public class Hand {
         fillRanks();
         fillSymbols();
         fillRankBySymbols();
+        rankOccurrences = ranks.values().stream().collect(Collectors.groupingBy(Function.identity(), Collectors.counting()));
+
+
         this.numberOfPairs = fillNumberOfPairs();
         this.drill = fillDrill();
         this.quad = fillQuad();
@@ -142,7 +148,7 @@ public class Hand {
             if (ranks.get(i).distance(ranks.get(i + 4)) == 4) {
                 if (highestNeeded && ACE.equals(ranks.get(i))) {
                     return true;
-                } else if (!highestNeeded){
+                } else if (!highestNeeded) {
                     return true;
                 }
             }
@@ -150,5 +156,10 @@ public class Hand {
         return false;
     }
 
+    public boolean isFullHouse() {
+        final int occurrencesHigherThanThree = (int) rankOccurrences.entrySet().stream().filter(entry -> entry.getKey() > 2).count();
+        final int occurrencesEqualTwo = (int) rankOccurrences.entrySet().stream().filter(entry -> entry.getKey() == 2).count();
+        return occurrencesHigherThanThree >= 2 || (occurrencesHigherThanThree == 1 && occurrencesEqualTwo >= 1);
+    }
 }
 

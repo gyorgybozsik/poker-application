@@ -34,13 +34,13 @@ public class HandValueServiceImpl implements HandValueService {
 
     @Override
     public @NonNull Set<TreeSet<Card>> getHandBasedOnValue(@NonNull final Value value, @NonNull final Hand hand) {
-        return switch (value){
+        return switch (value) {
             case ROYAL_FLUSH -> hand.getRoyalOrStraightFlush(true);
             case STRAIGHT_FLUSH -> hand.getRoyalOrStraightFlush2(false);
-            case POKER -> hand.getPoker();
+            case POKER -> hand.makePoker();
             case FULL_HOUSE -> hand.getFullHouse(true);
-            case FLUSH -> hand.getFlush();
-            case STRAIGHT -> hand.getStraight();
+            case FLUSH -> hand.makeFlush();
+            case STRAIGHT -> hand.makeStraight();
             case DRILL -> hand.getFullHouse(false);
             case TWO_PAIRS -> hand.getPair(true);
             case PAIR -> hand.getPair(false);
@@ -52,7 +52,7 @@ public class HandValueServiceImpl implements HandValueService {
 
         return switch (value) {
             case ROYAL_FLUSH, STRAIGHT_FLUSH -> checkRoyalOrStraightFlush(value, hand);
-            case POKER -> hand.isQuad();
+            case POKER -> hand.isPoker();
             case FULL_HOUSE -> hand.isFullHouse();
             case FLUSH -> hand.isFlush();
             case STRAIGHT -> hand.isStraight();

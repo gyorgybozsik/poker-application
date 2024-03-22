@@ -8,12 +8,23 @@ import java.util.Comparator;
 
 public record Card(Symbol symbol,
                    Rank rank) implements Comparable<Card> {
+
+
+
+
+
+   // public Card(int symbol, int rank) {
+   //     Symbol[] symbols = Symbol.values();
+   //     Rank[] ranks = Rank.values();
+   //     this.rank = ranks[rank];
+   //     this.symbol = symbols[symbol];
+   // }
     public boolean isHighest() {
         return rank.isHighest();
     }
 
-    public boolean isEqual(@NonNull final Rank highestRank) {
-        return rank.equals(highestRank);
+    public boolean isEqual(@NonNull final Rank rank) {
+        return this.rank.equals(rank);
     }
 
     @Override
@@ -33,4 +44,8 @@ public record Card(Symbol symbol,
     //  }
 
     final static Comparator<Card> cardComparator = Comparator.comparing(Card::rank).thenComparing(Card::symbol);
+
+    public String print() {
+        return symbol.name() + " " + rank.name();
+    }
 }

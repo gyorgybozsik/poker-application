@@ -6,4 +6,5 @@ public enum Symbol {
     CLUB,
     SPADE,
     ;
+
 }

@@ -36,15 +36,15 @@ public class HandValueServiceImpl implements HandValueService {
     public @NonNull Set<TreeSet<Card>> getHandBasedOnValue(@NonNull final Value value, @NonNull final Hand hand) {
         return switch (value){
             case ROYAL_FLUSH -> hand.getRoyalOrStraightFlush(true);
-            case STRAIGHT_FLUSH -> null;
-            case POKER -> null;
-            case FULL_HOUSE -> null;
-            case FLUSH -> null;
-            case STRAIGHT -> null;
-            case DRILL -> null;
-            case TWO_PAIRS -> null;
-            case PAIR -> null;
-            case NOTHING -> null;
+            case STRAIGHT_FLUSH -> hand.getRoyalOrStraightFlush2(false);
+            case POKER -> hand.getPoker();
+            case FULL_HOUSE -> hand.getFullHouse(true);
+            case FLUSH -> hand.getFlush();
+            case STRAIGHT -> hand.getStraight();
+            case DRILL -> hand.getFullHouse(false);
+            case TWO_PAIRS -> hand.getPair(true);
+            case PAIR -> hand.getPair(false);
+            case NOTHING -> hand.getHighestHand();
         };
     }
 

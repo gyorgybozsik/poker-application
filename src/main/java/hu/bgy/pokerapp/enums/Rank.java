@@ -30,7 +30,7 @@ public enum Rank {
         return this.ordinal() == 0;
     }
 
-    public boolean isHigher(@NonNull final Rank previousHighest) {
+    public boolean isHigher(@NonNull Rank previousHighest) {
         return this.ordinal() < previousHighest.ordinal();
     }
 }

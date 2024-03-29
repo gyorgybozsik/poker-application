@@ -195,7 +195,7 @@ public class HandValueServiceImplTest {
         assertThrows(IllegalArgumentException.class, () -> handValueService.evaluate(new Hand(cards)));
     }
 
-    private static Card card(final Symbol symbol, final Rank rank) {
+    public static Card card(final Symbol symbol, final Rank rank) {
         return new Card(symbol, rank);
     }
 

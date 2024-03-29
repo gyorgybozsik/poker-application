@@ -5,7 +5,6 @@ import hu.bgy.pokerapp.enums.Symbol;
 import hu.bgy.pokerapp.enums.Value;
 import hu.bgy.pokerapp.models.Card;
 import hu.bgy.pokerapp.models.Hand;
-import org.apache.tomcat.Jar;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -156,13 +155,9 @@ public class HandValueServiceImplTest {
                                 card(SPADE, NINE), card(SPADE, FIVE), card(HEARTH, TWO), card(DIAMOND, TEN),
                                 card(CLUB, NINE))),
                 Arguments.of(
-                        of(
-                                of(card(DIAMOND, JACK), card(SPADE, JACK), card(DIAMOND, TEN), card(CLUB, ACE), card(HEARTH, KING))),
+                        of(of(card(DIAMOND, JACK), card(SPADE, JACK), card(HEARTH, FIVE), card(CLUB, ACE), card(HEARTH, KING))),
                         PAIR,
-                        of(card(SPADE, JACK), card(HEARTH, FIVE), card(HEARTH, KING), card(DIAMOND, JACK),
-                                card(CLUB, ACE), card(SPADE, TWO),
-                                card(SPADE, THREE), card(SPADE, FIVE), card(HEARTH, TWO), card(DIAMOND, TEN),
-                                card(CLUB, NINE))),
+                        of(card(SPADE, JACK), card(HEARTH, FIVE), card(HEARTH, KING), card(DIAMOND, JACK), card(CLUB, ACE))),
                 Arguments.of(
                         of(
                                 of(card(CLUB, ACE), card(DIAMOND, KING), card(DIAMOND, QUEEN), card(SPADE, JACK), card(SPADE, NINE))),
@@ -173,16 +168,6 @@ public class HandValueServiceImplTest {
 
         );
     }
-    /*
-            Arguments.of(card(SPADE, ACE), card(SPADE, JACK), card(SPADE, TEN), card(SPADE, QUEEN), card(SPADE, KING),
-    card(DIAMOND, KING), card(DIAMOND, QUEEN), card(DIAMOND, TEN), card(DIAMOND, ACE), card(DIAMOND, JACK)),
-    ROYAL_FLUSH,
-    of (card(SPADE, ACE), card(SPADE, JACK), card(DIAMOND, KING), card(DIAMOND, QUEEN), card(SPADE, TEN),
-    card(SPADE, QUEEN), card(SPADE, KING), card(DIAMOND, TEN), card(DIAMOND, ACE), card(DIAMOND, JACK),
-    card(CLUB, ACE), card(HEARTH, TWO),
-    card(SPADE, FOUR), card(SPADE, SEVEN), card(SPADE, FIVE), card(SPADE, EIGHT), card(SPADE, SIX),
-    card(CLUB, TEN), card(CLUB, SEVEN), card(CLUB, NINE), card(CLUB, QUEEN)))
-            */
 
     @ParameterizedTest
     @MethodSource(value = "invalidValueTest")

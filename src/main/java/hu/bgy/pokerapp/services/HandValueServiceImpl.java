@@ -38,12 +38,12 @@ public class HandValueServiceImpl implements HandValueService {
             case ROYAL_FLUSH -> hand.getRoyalOrStraightFlush(true);
             case STRAIGHT_FLUSH -> hand.getRoyalOrStraightFlush2(false);
             case POKER -> hand.makePoker();
-            case FULL_HOUSE -> hand.getFullHouse(true);
+            case FULL_HOUSE -> hand.getFullHouse();
             case FLUSH -> hand.makeFlush();
             case STRAIGHT -> hand.makeStraight();
-            case DRILL -> hand.getFullHouse(false);
-            case TWO_PAIRS -> hand.getPair(true);
-            case PAIR -> hand.getPair(false);
+            case DRILL -> hand.makeDrill();
+            case TWO_PAIRS -> hand.getNPair(2);
+            case PAIR -> hand.getNPair(1);
             case NOTHING -> hand.getHighestHand();
         };
     }

@@ -292,74 +292,47 @@ public class Hand {
                 .orElseThrow(IllegalArgumentException::new);
     }
 
-    public Set<TreeSet<Card>> getFullHouse(final boolean highest) {
-        final Set<TreeSet<Card>> highestHands = new HashSet<>();
-        TreeSet<Rank> drill = ranks
-                .entrySet()
-                .stream()
-                .filter(entry -> entry.getValue() == 3)
-                .map(Map.Entry::getKey)
-                .collect(Collectors.toCollection(TreeSet::new));
-        TreeSet<Rank> pairs = ranks
-                .entrySet()
-                .stream()
-                .filter(entry -> entry.getValue() == 3 || entry.getValue() == 2)
-                .filter(entry -> !entry.getKey().equals(drill.getFirst()))
-                .map(Map.Entry::getKey)
-                .collect(Collectors.toCollection(TreeSet::new));
-        if (highest) highestHands.add(getCardsForList(drill.getFirst(), pairs.getFirst(), highest));
-        if (!highest) highestHands.add(getCardsForList(drill.getFirst(), null, highest));
-        return highestHands;
+    public Set<TreeSet<Card>> getFullHouse() {
+        final Rank drill = getRankThatOccursAtLeast(3).getFirst();
+        final TreeSet<Rank> pairs = getRankThatOccursAtLeast(2);
+        pairs.remove(drill);
+        return Set.of(getCardsForList(List.of(drill, pairs.getFirst())));
     }
 
+    public Set<TreeSet<Card>> makeDrill() {
+        final TreeSet<Rank> drill = getRankThatOccursAtLeast(3);
+        return Set.of(getCardsForList(drill));
+    }
 
-    //     final Set<TreeSet<Card>> highestHands = new HashSet<>();
-    //     Rank drill = null, pair = null;
-    //     boolean seenDrill = false, seenPair = false;
-    //     for (Iterator<Map.Entry<Rank, Integer>> iterator = ranks.entrySet().iterator(); iterator.hasNext(); ) {
-    //         Map.Entry<Rank, Integer> entry = iterator.next();
-    //         if (entry.getValue() == 3 || entry.getValue() == 2) {
-    //             if (entry.getValue() == 3 && (!seenDrill || !drill.isHigher(entry.getKey()))) {
-    //                 seenDrill = true;
-    //                 drill = entry.getKey();
-    //             } else if (!seenPair || !pair.isHigher(entry.getKey())) {
-    //                 seenPair = true;
-    //                 pair = entry.getKey();
-    //             }
-    //         }
-    //     }
-    //     TreeSet<Card> result = getCardsForList(drill, pair, highest);
-    //     highestHands.add(result);
-    //     return highestHands;
-    // }
+    private TreeSet<Rank> getRankThatOccursAtLeast(final int occurrence) {
+        return ranks
+                .entrySet()
+                .stream()
+                .filter(entry -> entry.getValue() >= occurrence)
+                .map(Map.Entry::getKey)
+                .collect(Collectors.toCollection(TreeSet::new));
+    }
 
     private TreeSet<Card> getCardsForList(
-            @NonNull Rank rank1,
-            Rank rank2,
-            boolean highest) {
-        List<Card> few = new ArrayList<>();
-        int pairCount = 0;
-        for (Card card : cards) {
-            if (card.isEqual(rank1)) few.add(card);
-            if (highest && card.isEqual(rank2) && pairCount < 2) {
-                few.add(card);
-                pairCount++;
-            }
+            @NonNull final Collection<Rank> collection) {// todo ha ki akarun váállogatni tetszőleges lapból tetszóleges értéket akkor ezt le kell cserélni egy Map
+        final int limit = 5;
+        final TreeSet<Card> result = new TreeSet<>();
+        for (Rank rank : collection) {
+            final int maxSize = limit - result.size();
+            Set<Card> collections = cards.stream()
+                    .filter(card -> card.rank().equals(rank))
+                    .limit(maxSize)
+                    .collect(Collectors.toSet());
+            result.addAll(collections);
         }
-        TreeSet<Card> result = new TreeSet<>(few);
+
         return fillHighCards(result);
     }
 
 
     public Set<TreeSet<Card>> makePoker() {
-        Set<TreeSet<Card>> highestHands = new HashSet<>();
-        ranks.entrySet()
-                .stream()
-                .filter(entry -> entry.getValue() == 4)
-                .map(entry -> makePokerHand(entry.getKey()))
-                .map(this::fillHighCards)
-                .forEach(highestHand -> handleHighestHand(highestHand, highestHands, false));
-        return highestHands;
+        final Rank poker = getRankThatOccursAtLeast(4).first();
+        return Set.of(getCardsForList(List.of(poker)));
     }
 
     private TreeSet<Card> fillHighCards(TreeSet<Card> setCards) {
@@ -392,25 +365,16 @@ public class Hand {
         return highestHands;
     }
 
-    public Set<TreeSet<Card>> getPair(final boolean highest) {
-        final Set<TreeSet<Card>> highestHands = new HashSet<>();
-        List<Rank> pairs = ranks
-                .entrySet()
+    public Set<TreeSet<Card>> getNPair(final int numberOfPairs) {
+        final List<Rank> pairs = getRankThatOccursAtLeast(2)
                 .stream()
-                .filter(entry -> entry.getValue() == 2)
-                .map(Map.Entry::getKey)
-                .distinct().sorted()
-                .collect(Collectors.toList());
-        highestHands.add(getCardsForList(pairs.get(0), pairs.get(1), highest));
-        return highestHands;
+                .limit(numberOfPairs)
+                .toList();
+        return Set.of(getCardsForList(pairs));
     }
 
     public Set<TreeSet<Card>> getHighestHand() {
         final Set<TreeSet<Card>> highestHands = new HashSet<>();
-        //final List<Card> line= new HashSet<>(cards).stream().sorted().toList().subList(0,5);
-        //;
-        //TreeSet<Card> fiveHigh = new TreeSet<>(line);
-        //highestHands.add(fiveHigh);
         highestHands.add(new TreeSet<>(new HashSet<>(cards).stream().sorted().toList().subList(0, 5)));
         return highestHands;
     }

@@ -61,12 +61,6 @@ public class HandValueServiceImpl implements HandValueService {
             case PAIR -> hand.isPair();
             case NOTHING -> hand.isNothing();
         };
-        //return (value.getNumberOfPairs() != 0 ? value.getNumberOfPairs() == hand.getNumberOfPairs() : true) &&
-        //        (value.isDrill() ? hand.isDrill() : true) &&
-        //        (value.isQuad() ? hand.isQuad() : true) &&
-        //        (value.isStraight() ? hand.isStraight() : true) &&
-        //        (value.isFlush() ? hand.isFlush() : true) &&
-        //        (value.isStraight() && value.isFlush() ? hand.isRoyalOrStraitFlush(value.isHighest()) : true);
     }
 
     private boolean checkRoyalOrStraightFlush(@NonNull final Value value, @NonNull final Hand hand) {

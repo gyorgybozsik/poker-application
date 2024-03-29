@@ -110,11 +110,6 @@ public class Hand {
     }
 
     private boolean fillStraight() {
-        // final List<Integer> values = cards.stream()
-        //         .map(Card::rank)
-        //         .map(Enum::ordinal)
-        //         .sorted()
-        //         .toList();
         final List<Rank> ranks = cards.stream().map(Card::rank).collect(Collectors.toSet()).stream().sorted().toList();
         return IntStream.range(0, ranks.size() - 4).anyMatch(i -> ranks.get(i).distance(ranks.get(i + 4)) == 4);
     }
@@ -123,8 +118,7 @@ public class Hand {
     private boolean fillFlush() {
         boolean seen = false;
         Integer best = null;
-        for (Iterator<Integer> iterator = symbols.values().iterator(); iterator.hasNext(); ) {
-            Integer i = iterator.next();
+        for (Integer i : symbols.values()) {
             if (!seen || i.compareTo(best) > 0) {
                 seen = true;
                 best = i;
@@ -265,14 +259,6 @@ public class Hand {
             }
         }
         return new TreeSet<>();
-    }
-
-    private TreeSet<Card> makePokerHand(
-            @NonNull final Rank rank) {
-        return cards
-                .stream()
-                .filter(card -> card.isEqual(rank))
-                .collect(Collectors.toCollection(TreeSet::new));
     }
 
     private @NonNull TreeSet<Card> collectCards(

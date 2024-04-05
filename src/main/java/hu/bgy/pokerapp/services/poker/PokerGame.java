@@ -1,4 +1,8 @@
 package hu.bgy.pokerapp.services.poker;
 
-public abstract class PokerGame {
+import hu.bgy.pokerapp.models.round.Round;
+
+public abstract class PokerGame<ROUND extends Round> {
+    private ROUND round;
+
 }

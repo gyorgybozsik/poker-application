@@ -1,4 +1,8 @@
 package hu.bgy.pokerapp.services.poker;
 
-public class TexasHoldem extends PokerGame {
+import hu.bgy.pokerapp.models.round.Round;
+import hu.bgy.pokerapp.models.round.TexasHoldemRound;
+
+public class TexasHoldem extends PokerGame<TexasHoldemRound> {
+
 }

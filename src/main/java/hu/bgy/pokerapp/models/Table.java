@@ -1,5 +1,6 @@
 package hu.bgy.pokerapp.models;
 
+import hu.bgy.pokerapp.models.round.Round;
 import hu.bgy.pokerapp.services.poker.PokerGame;
 import lombok.RequiredArgsConstructor;
 
@@ -7,9 +8,9 @@ import java.util.ArrayDeque;
 import java.util.Deque;
 
 @RequiredArgsConstructor
-public class Table <POKER extends PokerGame> {
+public class Table <ROUND extends Round, POKER extends PokerGame<ROUND>> {
     private final POKER poker;
-    Deque<Player> seats = new ArrayDeque<>();
+    final Deque<Player> seats = new ArrayDeque<>();
 
     /**
      * elsőnek feltöltjük valahogy a listát
@@ -20,7 +21,7 @@ public class Table <POKER extends PokerGame> {
      */
 
     private void rotatePlayers() {
-        Player player = seats.pollFirst();
+        final Player player = seats.pollFirst();
         seats.addLast(player);
 
     }

@@ -282,16 +282,17 @@ public class Hand {
         final Rank drill = getRankThatOccursAtLeast(3).getFirst();
         final TreeSet<Rank> pairs = getRankThatOccursAtLeast(2);
         pairs.remove(drill);
-        Map<Rank, Integer> map = new HashMap<>();
-        map.put(drill, 3);
-        map.put(pairs.getFirst(), 2);
+        final Map<Rank, Integer> map = Map.of(
+                drill, 3,
+                pairs.getFirst(), 2);
+
         return Set.of(getCardsForList(map));
     }
 
     public Set<TreeSet<Card>> makeDrill() {
         final Rank forDrill = getRankThatOccursAtLeast(3).getFirst();
-        Map<Rank, Integer> map = new HashMap<>();
-        map.put(forDrill, 3);
+        final Map<Rank, Integer> map = Map.of(forDrill, 3);
+
         return Set.of(getCardsForList(map));
     }
 
@@ -320,8 +321,8 @@ public class Hand {
 
     public Set<TreeSet<Card>> makePoker() {
         final Rank poker = getRankThatOccursAtLeast(4).first();
-        Map<Rank, Integer> map = new HashMap<>();
-        map.put(poker, 4);
+        final Map<Rank, Integer> map = Map.of(poker, 4);
+
         return Set.of(getCardsForList(map));
     }
 

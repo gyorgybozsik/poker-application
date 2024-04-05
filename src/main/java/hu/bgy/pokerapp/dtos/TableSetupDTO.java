@@ -7,7 +7,7 @@ import lombok.NonNull;
 import java.math.BigDecimal;
 import java.util.List;
 
-public record PokerSetupDTO(
+public record TableSetupDTO(
         @JsonProperty("poker") @NonNull PokerType pokerType,
         @NonNull BigDecimal cash,
         @NonNull BigDecimal smallBlind,

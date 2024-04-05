@@ -1,7 +1,7 @@
 package hu.bgy.pokerapp.controllers;
 
-import hu.bgy.pokerapp.dtos.PokerGameDTO;
-import hu.bgy.pokerapp.dtos.PokerSetupDTO;
+import hu.bgy.pokerapp.dtos.TableSetupDTO;
+import hu.bgy.pokerapp.dtos.TableDTO;
 import hu.bgy.pokerapp.services.GameService;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
@@ -23,7 +23,7 @@ public class GameController {
     }
 
     @PostMapping(value = "/create")
-    public PokerGameDTO creatPokerGame(@RequestBody @NonNull final PokerSetupDTO pokerSetup) {
-        return gameService.createGame(pokerSetup);
+    public TableDTO creatPokerGame(@RequestBody @NonNull final TableSetupDTO tableSetup) {
+        return gameService.createGame(tableSetup);
     }
 }

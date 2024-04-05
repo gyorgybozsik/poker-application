@@ -1,9 +1,9 @@
 package hu.bgy.pokerapp.services;
 
-import hu.bgy.pokerapp.dtos.PokerGameDTO;
-import hu.bgy.pokerapp.dtos.PokerSetupDTO;
+import hu.bgy.pokerapp.dtos.TableSetupDTO;
+import hu.bgy.pokerapp.dtos.TableDTO;
 import lombok.NonNull;
 
 public interface GameService {
-    @NonNull PokerGameDTO createGame(@NonNull final PokerSetupDTO pokerSetup);
+    @NonNull TableDTO createGame(@NonNull final TableSetupDTO tableSetup);
 }

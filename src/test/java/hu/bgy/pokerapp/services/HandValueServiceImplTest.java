@@ -143,7 +143,7 @@ public class HandValueServiceImplTest {
                                 of(card(DIAMOND, JACK), card(SPADE, JACK), card(CLUB, JACK), card(CLUB, ACE), card(SPADE, KING))),
                         DRILL,
                         of(card(SPADE, NINE), card(SPADE, JACK), card(SPADE, TEN), card(SPADE, KING), card(DIAMOND, JACK),
-                                card(CLUB, ACE), card(SPADE, TWO),
+                                card(CLUB, ACE), card(SPADE, TWO), card(HEARTH, JACK),
                                 card(SPADE, FOUR), card(SPADE, FIVE), card(SPADE, EIGHT), card(SPADE, SIX),
                                 card(CLUB, SEVEN), card(CLUB, JACK))),
                 Arguments.of(

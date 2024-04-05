@@ -1,8 +1,9 @@
 package hu.bgy.pokerapp.services;
 
-import hu.bgy.pokerapp.models.round.TexasHoldemRound;
-import hu.bgy.pokerapp.services.poker.TexasHoldem;
+import hu.bgy.pokerapp.dtos.PokerGameDTO;
+import hu.bgy.pokerapp.dtos.PokerSetupDTO;
+import lombok.NonNull;
 
-public class GameService {
-    private TableServiceImpl<TexasHoldemRound, TexasHoldem> table;
+public interface GameService {
+    @NonNull PokerGameDTO createGame(@NonNull final PokerSetupDTO pokerSetup);
 }

@@ -1,16 +1,12 @@
 package hu.bgy.pokerapp.services;
 
-import hu.bgy.pokerapp.models.Player;
 import hu.bgy.pokerapp.models.round.Round;
-import hu.bgy.pokerapp.services.poker.PokerGame;
+import hu.bgy.pokerapp.services.poker.Poker;
 import hu.bgy.pokerapp.services.poker.TableService;
 import lombok.RequiredArgsConstructor;
 
-import java.util.ArrayDeque;
-import java.util.Deque;
-
 @RequiredArgsConstructor
-public class TableServiceImpl<ROUND extends Round, POKER extends PokerGame<ROUND>> implements TableService {
+public class TableServiceImpl<ROUND extends Round, POKER extends Poker<ROUND>> implements TableService {
     private final POKER poker;
 
     /**

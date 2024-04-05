@@ -3,7 +3,6 @@ package hu.bgy.pokerapp.models;
 import lombok.Getter;
 import lombok.NonNull;
 
-import java.util.HashSet;
 import java.util.Set;
 
 @Getter

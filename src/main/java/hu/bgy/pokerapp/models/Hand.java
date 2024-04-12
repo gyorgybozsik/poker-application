@@ -15,7 +15,7 @@ import static org.springframework.util.CollectionUtils.isEmpty;
 
 @Getter
 public class Hand {
-    private final Set<Card> cards;
+    private final TreeSet<Card> cards;
 
     private final Map<Rank, Integer> ranks = new HashMap<>(5);
     private final Map<Symbol, Integer> symbols = new HashMap<>(4);
@@ -30,7 +30,7 @@ public class Hand {
     private final boolean flush;
     private final boolean highest;
 
-    public Hand(final Set<Card> cards) {
+    public Hand(final TreeSet<Card> cards) {
         this.cards = cards;
         validate();
 

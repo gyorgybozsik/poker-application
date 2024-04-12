@@ -11,6 +11,7 @@ import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.jupiter.params.provider.NullAndEmptySource;
 import org.springframework.boot.test.context.SpringBootTest;
 
+import java.util.Collections;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.stream.Stream;
@@ -18,7 +19,6 @@ import java.util.stream.Stream;
 import static hu.bgy.pokerapp.enums.Rank.*;
 import static hu.bgy.pokerapp.enums.Symbol.*;
 import static hu.bgy.pokerapp.enums.Value.*;
-import static java.util.Set.of;
 import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
@@ -89,7 +89,7 @@ public class HandValueServiceImplTest {
     public static Stream<Arguments> getTest() {
         return Stream.of(
                 Arguments.of(
-                        of(
+                        Set.of(
                                 of(card(SPADE, ACE), card(SPADE, JACK), card(SPADE, TEN), card(SPADE, QUEEN), card(SPADE, KING)),
                                 of(card(DIAMOND, KING), card(DIAMOND, QUEEN), card(DIAMOND, TEN), card(DIAMOND, ACE), card(DIAMOND, JACK))),
                         ROYAL_FLUSH,
@@ -99,7 +99,7 @@ public class HandValueServiceImplTest {
                                 card(SPADE, FOUR), card(SPADE, SEVEN), card(SPADE, FIVE), card(SPADE, EIGHT), card(SPADE, SIX),
                                 card(CLUB, TEN), card(CLUB, SEVEN), card(CLUB, NINE), card(CLUB, QUEEN))),
                 Arguments.of(
-                        of(
+                        Set.of(
                                 of(card(SPADE, NINE), card(SPADE, JACK), card(SPADE, TEN), card(SPADE, QUEEN), card(SPADE, KING)),
                                 of(card(DIAMOND, KING), card(DIAMOND, QUEEN), card(DIAMOND, TEN), card(DIAMOND, NINE), card(DIAMOND, JACK))),
                         STRAIGHT_FLUSH,
@@ -109,7 +109,7 @@ public class HandValueServiceImplTest {
                                 card(SPADE, FOUR), card(SPADE, SEVEN), card(SPADE, FIVE), card(SPADE, EIGHT), card(SPADE, SIX),
                                 card(CLUB, TEN), card(CLUB, SEVEN), card(CLUB, NINE), card(CLUB, QUEEN))),
                 Arguments.of(
-                        of(
+                        Set.of(
                                 of(card(DIAMOND, EIGHT), card(CLUB, EIGHT), card(SPADE, EIGHT), card(HEARTH, EIGHT), card(DIAMOND, ACE))),
                         POKER,
                         of(card(DIAMOND, EIGHT), card(CLUB, FIVE), card(DIAMOND, TWO), card(DIAMOND, ACE), card(SPADE, TEN),
@@ -117,7 +117,7 @@ public class HandValueServiceImplTest {
                                 card(CLUB, EIGHT), card(SPADE, FIVE), card(HEARTH, TWO),
                                 card(HEARTH, EIGHT), card(DIAMOND, FIVE), card(CLUB, TWO), card(SPADE, ACE), card(CLUB, TEN))),
                 Arguments.of(
-                        of(
+                        Set.of(
                                 of(card(DIAMOND, JACK), card(SPADE, JACK), card(CLUB, JACK), card(DIAMOND, KING), card(SPADE, KING))),
                         FULL_HOUSE,
                         of(card(SPADE, NINE), card(SPADE, JACK), card(DIAMOND, KING), card(DIAMOND, QUEEN), card(SPADE, TEN),
@@ -126,28 +126,28 @@ public class HandValueServiceImplTest {
                                 card(SPADE, FOUR), card(DIAMOND, SEVEN), card(SPADE, FIVE), card(SPADE, EIGHT), card(SPADE, SIX),
                                 card(HEARTH, TEN), card(CLUB, SEVEN), card(CLUB, NINE), card(CLUB, JACK))),
                 Arguments.of(
-                        of(
+                        Set.of(
                                 of(card(DIAMOND, TWO), card(DIAMOND, JACK), card(DIAMOND, FIVE), card(DIAMOND, ACE), card(DIAMOND, QUEEN))),
                         FLUSH,
                         of(card(SPADE, NINE), card(SPADE, JACK), card(SPADE, TWO), card(SPADE, KING), card(SPADE, FIVE),
                                 card(CLUB, FOUR), card(CLUB, QUEEN), card(CLUB, EIGHT), card(CLUB, SIX), card(CLUB, KING),
                                 card(DIAMOND, TWO), card(DIAMOND, FIVE), card(DIAMOND, JACK), card(DIAMOND, QUEEN), card(DIAMOND, ACE))),
                 Arguments.of(
-                        of(
-                                of(card(CLUB, TWO), card(SPADE, THREE), card(DIAMOND, FIVE), card(DIAMOND, FOUR), card(DIAMOND, SIX))),
+                        Set.of(
+                                of(card(HEARTH, TWO), card(SPADE, THREE), card(DIAMOND, FIVE), card(DIAMOND, FOUR), card(DIAMOND, SIX))),
                         STRAIGHT,
                         of(card(CLUB, TWO), card(HEARTH, TWO), card(SPADE, TWO), card(SPADE, THREE), card(DIAMOND, FIVE),
                                 card(DIAMOND, FOUR), card(DIAMOND, SIX), card(CLUB, ACE), card(CLUB, KING))),
                 Arguments.of(
-                        of(
-                                of(card(DIAMOND, JACK), card(SPADE, JACK), card(CLUB, JACK), card(CLUB, ACE), card(SPADE, KING))),
+                        Set.of(
+                                of(card(DIAMOND, JACK), card(HEARTH, JACK), card(CLUB, JACK), card(CLUB, ACE), card(SPADE, KING))),
                         DRILL,
                         of(card(SPADE, NINE), card(SPADE, JACK), card(SPADE, TEN), card(SPADE, KING), card(DIAMOND, JACK),
                                 card(CLUB, ACE), card(SPADE, TWO), card(HEARTH, JACK),
                                 card(SPADE, FOUR), card(SPADE, FIVE), card(SPADE, EIGHT), card(SPADE, SIX),
                                 card(CLUB, SEVEN), card(CLUB, JACK))),
                 Arguments.of(
-                        of(
+                        Set.of(
                                 of(card(DIAMOND, JACK), card(SPADE, JACK), card(CLUB, NINE), card(CLUB, ACE), card(SPADE, NINE))),
                         TWO_PAIRS,
                         of(card(SPADE, JACK), card(HEARTH, FIVE), card(HEARTH, KING), card(DIAMOND, JACK),
@@ -155,11 +155,11 @@ public class HandValueServiceImplTest {
                                 card(SPADE, NINE), card(SPADE, FIVE), card(HEARTH, TWO), card(DIAMOND, TEN),
                                 card(CLUB, NINE))),
                 Arguments.of(
-                        of(of(card(DIAMOND, JACK), card(SPADE, JACK), card(HEARTH, FIVE), card(CLUB, ACE), card(HEARTH, KING))),
+                        Set.of(of(card(DIAMOND, JACK), card(SPADE, JACK), card(HEARTH, FIVE), card(CLUB, ACE), card(HEARTH, KING))),
                         PAIR,
                         of(card(SPADE, JACK), card(HEARTH, FIVE), card(HEARTH, KING), card(DIAMOND, JACK), card(CLUB, ACE))),
                 Arguments.of(
-                        of(
+                        Set.of(
                                 of(card(CLUB, ACE), card(DIAMOND, KING), card(DIAMOND, QUEEN), card(SPADE, JACK), card(SPADE, NINE))),
                         NOTHING,
                         of(card(SPADE, NINE), card(SPADE, JACK), card(DIAMOND, KING), card(DIAMOND, QUEEN), card(CLUB, TWO),
@@ -171,19 +171,19 @@ public class HandValueServiceImplTest {
 
     @ParameterizedTest
     @MethodSource(value = "invalidValueTest")
-    void testDifferentHandsWithInvalidInputs(final Set<Card> cards) {
+    void testDifferentHandsWithInvalidInputs(final TreeSet<Card> cards) {
         assertThrows(IllegalArgumentException.class, () -> handValueService.evaluate(hand(cards)));
     }
 
     @ParameterizedTest
     @MethodSource(value = "validValueTest")
-    void testDifferentHandsWithValidInputs(final Value expected, final Set<Card> cards) {
+    void testDifferentHandsWithValidInputs(final Value expected, final TreeSet<Card> cards) {
         assertEquals(expected, handValueService.evaluate(hand(cards)));
     }
 
     @ParameterizedTest
     @MethodSource(value = "getTest")
-    void testGetValue(final Set<TreeSet<Card>> expected, final Value value, final Set<Card> cards) {
+    void testGetValue(final Set<TreeSet<Card>> expected, final Value value, final TreeSet<Card> cards) {
         Set<TreeSet<Card>> handBasedOnValue = handValueService.getHandBasedOnValue(value, hand(cards));
         assertTrue(handBasedOnValue.containsAll(expected));
         assertEquals(expected, handBasedOnValue);
@@ -191,7 +191,7 @@ public class HandValueServiceImplTest {
 
     @ParameterizedTest
     @NullAndEmptySource
-    void testDifferentHands(final Set<Card> cards) {
+    void testDifferentHands(final TreeSet<Card> cards) {
         assertThrows(IllegalArgumentException.class, () -> handValueService.evaluate(new Hand(cards)));
     }
 
@@ -199,7 +199,14 @@ public class HandValueServiceImplTest {
         return new Card(symbol, rank);
     }
 
-    private Hand hand(final Set<Card> cards) {
+    private Hand hand(final TreeSet<Card> cards) {
         return new Hand(cards);
+    }
+
+    @SafeVarargs
+    private static <T> TreeSet<T> of(T... elements) {
+        final TreeSet<T> result = new TreeSet<>();
+        Collections.addAll(result, elements);
+        return result;
     }
 }

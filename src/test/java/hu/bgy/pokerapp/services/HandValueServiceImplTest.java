@@ -110,8 +110,18 @@ public class HandValueServiceImplTest {
                                 card(CLUB, TEN), card(CLUB, SEVEN), card(CLUB, NINE), card(CLUB, QUEEN))),
                 Arguments.of(
                         Set.of(
+                                of(card(DIAMOND, EIGHT), card(CLUB, EIGHT), card(SPADE, EIGHT), card(HEARTH, EIGHT), card(SPADE, ACE)),
+                                of(card(DIAMOND, EIGHT), card(CLUB, EIGHT), card(SPADE, EIGHT), card(HEARTH, EIGHT), card(CLUB, ACE)),
                                 of(card(DIAMOND, EIGHT), card(CLUB, EIGHT), card(SPADE, EIGHT), card(HEARTH, EIGHT), card(DIAMOND, ACE))),
                         POKER,
+                        of(card(DIAMOND, EIGHT), card(CLUB, FIVE), card(DIAMOND, TWO), card(DIAMOND, ACE), card(SPADE, TEN),
+                                card(SPADE, EIGHT), card(HEARTH, FIVE), card(SPADE, TWO), card(CLUB, ACE),
+                                card(CLUB, EIGHT), card(SPADE, FIVE), card(HEARTH, TWO),
+                                card(HEARTH, EIGHT), card(DIAMOND, FIVE), card(CLUB, TWO), card(SPADE, ACE), card(CLUB, TEN))),
+                Arguments.of(
+                        Set.of(
+                                of(card(DIAMOND, ACE), card(CLUB, ACE), card(SPADE, ACE), card(SPADE, TEN), card(CLUB, TEN))),
+                        FULL_HOUSE,
                         of(card(DIAMOND, EIGHT), card(CLUB, FIVE), card(DIAMOND, TWO), card(DIAMOND, ACE), card(SPADE, TEN),
                                 card(SPADE, EIGHT), card(HEARTH, FIVE), card(SPADE, TWO), card(CLUB, ACE),
                                 card(CLUB, EIGHT), card(SPADE, FIVE), card(HEARTH, TWO),
@@ -142,7 +152,7 @@ public class HandValueServiceImplTest {
                         Set.of(
                                 of(card(DIAMOND, JACK), card(HEARTH, JACK), card(CLUB, JACK), card(CLUB, ACE), card(SPADE, KING))),
                         DRILL,
-                        of(card(SPADE, NINE), card(SPADE, JACK), card(SPADE, TEN), card(SPADE, KING), card(DIAMOND, JACK),
+                        of(card(SPADE, NINE), card(SPADE, TEN), card(SPADE, KING), card(DIAMOND, JACK),
                                 card(CLUB, ACE), card(SPADE, TWO), card(HEARTH, JACK),
                                 card(SPADE, FOUR), card(SPADE, FIVE), card(SPADE, EIGHT), card(SPADE, SIX),
                                 card(CLUB, SEVEN), card(CLUB, JACK))),

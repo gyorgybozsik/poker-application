@@ -282,14 +282,14 @@ public class HandValueServiceImpl implements HandValueService {
                 drill, 3,
                 pairs.getFirst(), 2);
 
-        return Set.of(getCardsForList(hand, map));
+        return getCardsForList(hand, map);
     }
 
     public @NonNull Set<TreeSet<Card>> makeDrill(@NonNull final Hand hand) {
         final Rank forDrill = getRankThatOccursAtLeast(hand, 3).getFirst();
         final Map<Rank, Integer> map = Map.of(forDrill, 3);
 
-        return Set.of(getCardsForList(hand, map));
+        return getCardsForList(hand, map);
     }
 
     private @NonNull TreeSet<Rank> getRankThatOccursAtLeast(@NonNull final Hand hand, final int occurrence) {
@@ -301,40 +301,122 @@ public class HandValueServiceImpl implements HandValueService {
                 .collect(Collectors.toCollection(TreeSet::new));
     }
 
-    private @NonNull TreeSet<Card> getCardsForList(
+    private @NonNull Set<TreeSet<Card>> getCardsForList(
             @NonNull final Hand hand,
             @NonNull final Map<Rank, Integer> map) {
-        final TreeSet<Card> result = new TreeSet<>();
+
+        int sizeOfFigure = 0;
+        final Map<List<Card>, Integer> cardOccurrences = new HashMap<>();
         for (Map.Entry<Rank, Integer> entry : map.entrySet()) {
-            Set<Card> collections = hand.getCards().stream()
+            List<Card> collections = hand.getCards().stream()
                     .filter(card -> card.rank().equals(entry.getKey()))
-                    .limit(entry.getValue())
-                    .collect(Collectors.toSet());
-            result.addAll(collections);
+                    .toList();
+            cardOccurrences.put(collections, entry.getValue());
+            sizeOfFigure += entry.getValue();
         }
 
-        return fillHighCards(hand, result);
+        final TreeSet<Card> remainingCards = new TreeSet<>(hand.getCards());
+        for (List<Card> cards : cardOccurrences.keySet()) {
+            cards.forEach(remainingCards::remove);
+        }
+        final List<List<Card>> highCards = getNominatedHighCards(remainingCards);
+        for (int i = 0; i < 5 - sizeOfFigure; i++) {
+            cardOccurrences.put(highCards.get(i), 1);
+        }
+
+        Set<TreeSet<Card>> result = new HashSet<>();
+        for (Map.Entry<List<Card>, Integer> entry : cardOccurrences.entrySet()) {
+            result = collectVariationOfCards(result, entry);
+        }
+
+        return result;
+    }
+
+    private @NonNull Set<TreeSet<Card>> collectVariationOfCards(
+            @NonNull final Set<TreeSet<Card>> previouses,
+            @NonNull final Map.Entry<List<Card>, Integer> entry) {
+        final Set<TreeSet<Card>> result = new HashSet<>();
+        final Set<TreeSet<Card>> variations = getVariations(entry);
+        if(previouses.isEmpty()){
+            return variations;
+        }
+
+
+        for (TreeSet<Card> previous : previouses) {
+            for (TreeSet<Card> variation : variations) {
+                final TreeSet<Card> next = new TreeSet<>();
+                next.addAll(previous);
+                next.addAll(variation);
+                result.add(next);
+            }
+        }
+
+        return result;
+    }
+
+    private @NonNull Set<TreeSet<Card>> getVariations(@NonNull final Map.Entry<List<Card>, Integer> entry) {
+        final Set<TreeSet<Card>> variations = new HashSet<>();
+        entry.getKey().forEach(card -> {
+            if (entry.getValue() == 1) {
+                final TreeSet<Card> variation = new TreeSet<>();
+                variation.add(card);
+                variations.add(variation);
+            } else {
+                final Set<Card> remaining = new HashSet<>(entry.getKey());
+                remaining.remove(card);
+                final Set<TreeSet<Card>> previousVariations = collectFurtherVariation(remaining, entry.getValue() - 1);
+                for (TreeSet<Card> previousVariation : previousVariations) {
+                    previousVariation.add(card);
+                    variations.add(previousVariation);
+                }
+            }
+        });
+        return variations;
+    }
+
+    private @NonNull Set<TreeSet<Card>> collectFurtherVariation(@NonNull final Set<Card> remaining, final int size) {
+        final Set<TreeSet<Card>> variations = new HashSet<>();
+        for (Card card : remaining) {
+            if (size == 1) {
+                final TreeSet<Card> variation = new TreeSet<>();
+                variation.add(card);
+                variations.add(variation);
+            } else {
+                final Set<Card> nextRemaining = new TreeSet<>(remaining);
+                nextRemaining.remove(card);
+                final Set<TreeSet<Card>> previousVariations = collectFurtherVariation(nextRemaining, size - 1);
+                for (TreeSet<Card> previousVariation : previousVariations) {
+                    previousVariation.add(card);
+                    variations.add(previousVariation);
+                }
+            }
+        }
+
+        return variations;
+    }
+
+    private static List<List<Card>> getNominatedHighCards(@NonNull final TreeSet<Card> remainingCards) {
+        final Map<Rank, List<Card>> cardsByRank = new TreeMap<>();
+        remainingCards.forEach(card -> {
+            if (cardsByRank.containsKey(card.rank())) {
+                final List<Card> cards = cardsByRank.get(card.rank());
+                cards.add(card);
+                cardsByRank.put(card.rank(), cards);
+            } else {
+                final List<Card> cards = new ArrayList<>();
+                cards.add(card);
+                cardsByRank.put(card.rank(), cards);
+            }
+        });
+
+        return cardsByRank.values().stream().toList();
     }
 
     public @NonNull Set<TreeSet<Card>> makePoker(@NonNull final Hand hand) {
         final Rank poker = getRankThatOccursAtLeast(hand, 4).first();
         final Map<Rank, Integer> map = Map.of(poker, 4);
 
-        return Set.of(getCardsForList(hand, map));
-    }
-
-    private TreeSet<Card> fillHighCards(
-            @NonNull final Hand hand,
-            @NonNull final TreeSet<Card> setCards) {
-        TreeSet<Card> treeSet = hand.getCards().stream()
-                .filter(card -> !setCards.contains(card))
-                .collect(Collectors
-                        .toCollection(TreeSet::new));
-        while (setCards.size() < 5) {
-            setCards.add(treeSet.getFirst());
-            treeSet.remove(treeSet.getFirst());
-        }
-        return setCards;
+        return getCardsForList(hand, map);
     }
 
 
@@ -363,13 +445,14 @@ public class HandValueServiceImpl implements HandValueService {
         final Map<Rank, Integer> map = pairs.stream()
                 .collect(Collectors.toMap(rank -> rank, rank -> 2, (a, b) -> b));
 
-        return Set.of(getCardsForList(hand, map));
+        return getCardsForList(hand, map);
     }
 
     public Set<TreeSet<Card>> getHighestHand(@NonNull final Hand hand) {
-        final Set<TreeSet<Card>> highestHands = new HashSet<>();
-        highestHands.add(new TreeSet<>(new HashSet<>(hand.getCards()).stream().sorted().toList().subList(0, 5)));
-        return highestHands;
+        //final Set<TreeSet<Card>> highestHands = new HashSet<>();
+        //highestHands.add(new TreeSet<>(new HashSet<>(hand.getCards()).stream().sorted().toList().subList(0, 5)));
+        //return highestHands;
+        return getCardsForList(hand, Collections.emptyMap());
     }
 
     public @NonNull Set<TreeSet<Card>> makeStraight(@NonNull final Hand hand) {

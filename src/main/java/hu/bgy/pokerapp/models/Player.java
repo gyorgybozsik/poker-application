@@ -25,4 +25,8 @@ public class Player {
     public boolean isActive() {
         return PlayerState.ACTIVE.equals(state);
     }
+
+    public void bet(@NonNull final BigDecimal betAmount) {
+        balance.bet(betAmount);
+    }
 }

@@ -41,6 +41,19 @@ public class GameMapperImpl implements GameMapper {
     @Override
     public @NonNull TableDTO mapTableToTableDTO(@NonNull final Table table) {
 
-        return null;
+        return new TableDTO(table.getUuid(),
+                table.getPokerType(),
+                table.getSmallBlind(),
+                mapPlayersToPlayerDTOs(table.getSeats()));
+    }
+
+    private Deque<PlayerDTO> mapPlayersToPlayerDTOs(@NonNull final Deque<Player> seats) {
+        return seats.stream()
+                .map(this::mapPlayerToPlayerDTO)
+                .collect(Collectors.toCollection(LinkedList::new));
+    }
+
+    private PlayerDTO mapPlayerToPlayerDTO(Player player) {
+        return new PlayerDTO(player.getName());
     }
 }

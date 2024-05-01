@@ -1,8 +1,10 @@
 package hu.bgy.pokerapp.mappers;
 
+import hu.bgy.pokerapp.dtos.BalanceDTO;
 import hu.bgy.pokerapp.dtos.PlayerDTO;
 import hu.bgy.pokerapp.dtos.TableDTO;
 import hu.bgy.pokerapp.dtos.TableSetupDTO;
+import hu.bgy.pokerapp.models.Balance;
 import hu.bgy.pokerapp.models.Player;
 import hu.bgy.pokerapp.models.Table;
 import lombok.NonNull;
@@ -54,6 +56,11 @@ public class GameMapperImpl implements GameMapper {
     }
 
     private PlayerDTO mapPlayerToPlayerDTO(Player player) {
-        return new PlayerDTO(player.getName());
+        return new PlayerDTO(player.getName(), mapBalanceToBalanceDTO(player.getBalance()));
+    }
+
+    private BalanceDTO mapBalanceToBalanceDTO(Balance balance) {
+        //return new BalanceDTO(balance.getCash(), balance.getBet());
+    return BalanceDTO.builder().cash(balance.getCash()).bet(balance.getBet()).build();
     }
 }

@@ -10,15 +10,14 @@ import java.math.BigDecimal;
 public class Player {
 
     private String name;
-    private BigDecimal cash;
-
+    private Balance balance;
     private PlayerState state;
 
     public Player(
             @NonNull final String name,
             @NonNull final BigDecimal cash) {
         this.name = name;
-        this.cash = cash;
+        this.balance = new Balance(cash);
 
         state = PlayerState.ACTIVE;
     }

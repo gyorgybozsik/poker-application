@@ -2,5 +2,6 @@ package hu.bgy.pokerapp.dtos;
 
 import lombok.NonNull;
 
-public record PlayerDTO(@NonNull String name) {
+public record PlayerDTO(@NonNull String name, BalanceDTO balanceDTO) {
+
 }

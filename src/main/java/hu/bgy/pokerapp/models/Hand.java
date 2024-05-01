@@ -11,7 +11,7 @@ import static org.springframework.util.CollectionUtils.isEmpty;
 public class Hand {
     private final TreeSet<Card> cards;
     @Setter
-    private HandState handState;
+    private HandEvaluation latestHandEvaluation;
 
     public Hand(final TreeSet<Card> cards) {
         this.cards = cards;
@@ -23,5 +23,12 @@ public class Hand {
         if (isEmpty(cards) || cards.size() < 5) {
             throw new IllegalArgumentException();
         }
+    }
+
+    public HandState getHandState() {
+        if (latestHandEvaluation == null) {
+            throw new IllegalStateException("Latest hand evaluation is not initialized");
+        }
+        return latestHandEvaluation.getHandState();
     }
 }

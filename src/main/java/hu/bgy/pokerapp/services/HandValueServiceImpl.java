@@ -5,7 +5,7 @@ import hu.bgy.pokerapp.enums.Symbol;
 import hu.bgy.pokerapp.enums.Value;
 import hu.bgy.pokerapp.models.Card;
 import hu.bgy.pokerapp.models.Hand;
-import hu.bgy.pokerapp.models.HandState;
+import hu.bgy.pokerapp.models.HandEvaluation;
 import lombok.NonNull;
 import org.springframework.lang.Nullable;
 
@@ -71,9 +71,9 @@ public class HandValueServiceImpl implements HandValueService {
         };
     }
 
-    private void fillHandState(@NonNull final Hand hand) {
-        final HandState handState = new HandState(hand.getCards());
-        hand.setHandState(handState);
+    private void fillHandState(@NonNull final Hand hand) {//todo : Majd table lapjait hozzáadni
+        final HandEvaluation evaluation = new HandEvaluation(hand.getCards(), new TreeSet<>());
+        hand.setLatestHandEvaluation(evaluation);
     }
 
     private boolean checkRoyalOrStraightFlush(@NonNull final Value value, @NonNull final Hand hand) {

@@ -1,6 +1,6 @@
 package hu.bgy.pokerapp.models;
 
-import hu.bgy.pokerapp.enums.PlayerState;
+import hu.bgy.pokerapp.enums.InGameState;
 import jakarta.persistence.*;
 import jakarta.persistence.Table;
 import lombok.AccessLevel;
@@ -28,7 +28,7 @@ public class Player {
 
     @Enumerated(EnumType.STRING)
     @Column(name = "state", nullable = false)
-    private PlayerState state;
+    private InGameState state;
 
     public Player(
             @NonNull final String name,
@@ -36,11 +36,11 @@ public class Player {
         this.name = name;
         this.balance = new Balance(cash);
 
-        state = PlayerState.ACTIVE;
+        state = InGameState.ACTIVE;
     }
 
     public boolean isActive() {
-        return PlayerState.ACTIVE.equals(state);
+        return InGameState.ACTIVE.equals(state);
     }
 
     public void bet(@NonNull final BigDecimal betAmount) {

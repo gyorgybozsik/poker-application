@@ -1,6 +1,6 @@
 package hu.bgy.pokerapp.enums;
 
-public enum PlayerState {
+public enum InGameState {
     ACTIVE,
     SIT_OUT,
     ;

@@ -22,7 +22,5 @@ public class TexasHoldemRound extends Round {
         Player bigBlind = players.pollFirst();
         bigBlind.bet(smallBlind.multiply(BigDecimal.TWO));
         players.add(bigBlind);
-
     }
-
 }

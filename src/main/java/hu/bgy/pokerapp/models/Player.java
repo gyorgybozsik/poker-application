@@ -1,16 +1,33 @@
 package hu.bgy.pokerapp.models;
 
 import hu.bgy.pokerapp.enums.PlayerState;
+import jakarta.persistence.*;
+import jakarta.persistence.Table;
+import lombok.AccessLevel;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import lombok.NonNull;
 
 import java.math.BigDecimal;
 
 @Data
+@Entity
+@Table(name = "players")
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Player {
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    private long id;
 
+    @Column(name = "name", nullable = false)
     private String name;
+
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "balance_id", referencedColumnName = "id", nullable = false)
     private Balance balance;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "state", nullable = false)
     private PlayerState state;
 
     public Player(

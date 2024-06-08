@@ -13,16 +13,18 @@ import lombok.NoArgsConstructor;
 @Table(name = "player_states")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class PlayerState {
+
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    private long id;
+    @GeneratedValue(strategy = GenerationType.SEQUENCE)
+    //@SequenceGenerator(name = "ps_seq_g", sequenceName = "player_states_id_seq")
+    private Long id;
 
     @OneToOne()
     @JoinColumn(name = "player_id", referencedColumnName = "id", nullable = false)
     private Player player;
 
-    @Column(name = "table_id", nullable = false)
-    private Long tableId;
+   // @Column(name = "table_id", nullable = false)
+   // private Long tableId;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "in_game_state", nullable = false)
@@ -31,4 +33,10 @@ public class PlayerState {
     @Enumerated(EnumType.STRING)
     @Column(name = "round_role", nullable = false)
     private RoundRole roundRole;
+
+    public PlayerState(Player player, RoundRole roundRole) {
+        inGameState = InGameState.ACTIVE;
+        this.roundRole = roundRole;
+        this.player = player;
+    }
 }

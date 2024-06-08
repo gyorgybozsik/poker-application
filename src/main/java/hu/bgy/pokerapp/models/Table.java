@@ -11,6 +11,8 @@ import lombok.NonNull;
 import java.math.BigDecimal;
 import java.util.List;
 
+import static hu.bgy.pokerapp.enums.RoundRole.SPEAKER_1;
+
 
 @Data
 @Entity
@@ -18,17 +20,18 @@ import java.util.List;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Table {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    private long id;
+    @GeneratedValue(strategy = GenerationType.SEQUENCE)
+    // @SequenceGenerator(name = "t_seq_g", sequenceName = "tables_id_seq")
+    private Long id;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "poker_type", nullable = false)
     private PokerType pokerType;
 
-    @Column (name = "small_blind",nullable = false)
+    @Column(name = "small_blind", nullable = false)
     private BigDecimal smallBlind;
 
-    @OneToMany (mappedBy = "table")
+    @OneToMany(mappedBy = "table", cascade = CascadeType.ALL)
     private List<Player> seats;
 
     @Enumerated(EnumType.STRING)
@@ -40,7 +43,6 @@ public class Table {
                  @NonNull final BigDecimal smallBlind) {
         this.pokerType = pokerType;
         this.smallBlind = smallBlind;
+        speaker = SPEAKER_1;
     }
-
-
 }

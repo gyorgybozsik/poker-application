@@ -15,14 +15,17 @@ import java.math.BigDecimal;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Balance {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    private long id;
+    @GeneratedValue(strategy = GenerationType.SEQUENCE)
+    // @SequenceGenerator(name = "b_seq_g", sequenceName = "balances_id_seq")
+    private Long id;
 
     @Column(name = "cash")
     private BigDecimal cash;
 
     @Column(name = "bet")
     private BigDecimal bet;
+    @OneToOne (mappedBy = "balance")
+    private Player player;
 
     public Balance(BigDecimal cash) {
         this.cash = cash;

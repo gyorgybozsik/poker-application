@@ -4,6 +4,7 @@ import hu.bgy.pokerapp.dtos.BalanceDTO;
 import hu.bgy.pokerapp.dtos.PlayerDTO;
 import hu.bgy.pokerapp.dtos.TableDTO;
 import hu.bgy.pokerapp.dtos.TableSetupDTO;
+import hu.bgy.pokerapp.enums.RoundRole;
 import hu.bgy.pokerapp.models.Balance;
 import hu.bgy.pokerapp.models.Player;
 import hu.bgy.pokerapp.models.Table;
@@ -11,6 +12,7 @@ import lombok.NonNull;
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.List;
 
 @Component
@@ -18,23 +20,32 @@ public class GameMapperImpl implements GameMapper {
     @Override
     public @NonNull Table mapTableSetupToTable(@NonNull final TableSetupDTO tableSetup) {
         final Table table = new Table(tableSetup.pokerType(), tableSetup.smallBlind());
-        table.setSeats(mapPlayerDTOsTOPlayers(tableSetup.players(), tableSetup.cash()));
+        table.setSeats(mapPlayerDTOsTOPlayers(tableSetup.players(), table, tableSetup.cash()));
 
         return table;
     }
 
     private @NonNull List<Player> mapPlayerDTOsTOPlayers(
             @NonNull final List<PlayerDTO> playerDTOs,
+            @NonNull final Table table,
             @NonNull final BigDecimal cash) {
-        return playerDTOs.stream()
-                .map(playerDTO -> mapPlayerDTOToPlayer(playerDTO, cash))
-                .toList();
+        List<Player> list = new ArrayList<>();
+        RoundRole[] roundRoles = RoundRole.values();
+        for (int i = 0; i < playerDTOs.size(); i++) {
+            PlayerDTO playerDTO = playerDTOs.get(i);
+            Player player = mapPlayerDTOToPlayer(playerDTO, cash, roundRoles[i]);
+            player.setTable(table);
+            list.add(player);
+        }
+        return list;
     }
 
     private @NonNull Player mapPlayerDTOToPlayer(
             @NonNull PlayerDTO playerDTO,
-            @NonNull BigDecimal cash) {
-        return new Player(playerDTO.name(), cash);
+            @NonNull BigDecimal cash,
+            @NonNull RoundRole roundRole
+            ) {
+        return new Player(playerDTO.name(), cash, roundRole);
     }
 
     @Override

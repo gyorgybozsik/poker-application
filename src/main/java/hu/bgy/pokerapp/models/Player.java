@@ -1,6 +1,7 @@
 package hu.bgy.pokerapp.models;
 
 import hu.bgy.pokerapp.enums.InGameState;
+import hu.bgy.pokerapp.enums.RoundRole;
 import jakarta.persistence.*;
 import jakarta.persistence.Table;
 import lombok.AccessLevel;
@@ -16,8 +17,9 @@ import java.math.BigDecimal;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Player {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    private long id;
+    @GeneratedValue(strategy = GenerationType.SEQUENCE)
+  //  @SequenceGenerator(name = "p_seq_g", sequenceName = "players_id_seq")
+    private Long id;
 
     @Column(name = "name", nullable = false)
     private String name;
@@ -26,7 +28,7 @@ public class Player {
     @JoinColumn(name = "balance_id", referencedColumnName = "id", nullable = false)
     private Balance balance;
 
-    @OneToOne(cascade = CascadeType.ALL)
+    @OneToOne(mappedBy = "player", cascade = CascadeType.ALL)
     private PlayerState state;
 
     @ManyToOne
@@ -35,11 +37,12 @@ public class Player {
 
     public Player(
             @NonNull final String name,
-            @NonNull final BigDecimal cash) {
+            @NonNull final BigDecimal cash,
+            @NonNull final RoundRole roundRole) {
         this.name = name;
         this.balance = new Balance(cash);
-
-        state = new PlayerState();
+        balance.setPlayer(this);
+        state = new PlayerState(this,roundRole);
     }
 
     public boolean isActive() {

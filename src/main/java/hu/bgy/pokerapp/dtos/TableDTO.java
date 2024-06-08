@@ -1,15 +1,17 @@
 package hu.bgy.pokerapp.dtos;
 
 import hu.bgy.pokerapp.enums.PokerType;
+import hu.bgy.pokerapp.enums.RoundRole;
 
 import java.math.BigDecimal;
-import java.util.Deque;
-import java.util.UUID;
+import java.util.List;
 
-public record TableDTO(UUID uuid,
+public record TableDTO(//UUID uuid,
+                       long id,
+                       RoundRole speaker,
                        PokerType pokerType,
                        BigDecimal smallBlind,
-                       Deque<PlayerDTO> seats) {
+                       List<PlayerDTO> seats) {
 
 
 }

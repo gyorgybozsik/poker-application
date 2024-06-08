@@ -11,10 +11,7 @@ import lombok.NonNull;
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
-import java.util.Deque;
-import java.util.LinkedList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Component
 public class GameMapperImpl implements GameMapper {
@@ -26,12 +23,12 @@ public class GameMapperImpl implements GameMapper {
         return table;
     }
 
-    private @NonNull Deque<Player> mapPlayerDTOsTOPlayers(
+    private @NonNull List<Player> mapPlayerDTOsTOPlayers(
             @NonNull final List<PlayerDTO> playerDTOs,
             @NonNull final BigDecimal cash) {
         return playerDTOs.stream()
                 .map(playerDTO -> mapPlayerDTOToPlayer(playerDTO, cash))
-                .collect(Collectors.toCollection(LinkedList::new));
+                .toList();
     }
 
     private @NonNull Player mapPlayerDTOToPlayer(
@@ -43,16 +40,17 @@ public class GameMapperImpl implements GameMapper {
     @Override
     public @NonNull TableDTO mapTableToTableDTO(@NonNull final Table table) {
 
-        return new TableDTO(table.getUuid(),
+        return new TableDTO(table.getId(),
+                table.getSpeaker(),
                 table.getPokerType(),
                 table.getSmallBlind(),
                 mapPlayersToPlayerDTOs(table.getSeats()));
     }
 
-    private Deque<PlayerDTO> mapPlayersToPlayerDTOs(@NonNull final Deque<Player> seats) {
+    private List<PlayerDTO> mapPlayersToPlayerDTOs(@NonNull final List<Player> seats) {
         return seats.stream()
                 .map(this::mapPlayerToPlayerDTO)
-                .collect(Collectors.toCollection(LinkedList::new));
+                .toList();
     }
 
     private PlayerDTO mapPlayerToPlayerDTO(Player player) {

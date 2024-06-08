@@ -26,9 +26,12 @@ public class Player {
     @JoinColumn(name = "balance_id", referencedColumnName = "id", nullable = false)
     private Balance balance;
 
-    @Enumerated(EnumType.STRING)
-    @Column(name = "state", nullable = false)
-    private InGameState state;
+    @OneToOne(cascade = CascadeType.ALL)
+    private PlayerState state;
+
+    @ManyToOne
+    @JoinColumn(name = "table_id")
+    private hu.bgy.pokerapp.models.Table table;
 
     public Player(
             @NonNull final String name,
@@ -36,7 +39,7 @@ public class Player {
         this.name = name;
         this.balance = new Balance(cash);
 
-        state = InGameState.ACTIVE;
+        state = new PlayerState();
     }
 
     public boolean isActive() {

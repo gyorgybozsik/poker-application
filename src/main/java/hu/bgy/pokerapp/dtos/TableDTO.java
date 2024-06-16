@@ -8,6 +8,7 @@ import java.util.List;
 
 public record TableDTO(//UUID uuid,
                        long id,
+                       int round,
                        RoundRole speaker,
                        PokerType pokerType,
                        BigDecimal smallBlind,

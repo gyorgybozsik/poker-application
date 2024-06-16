@@ -52,6 +52,7 @@ public class GameMapperImpl implements GameMapper {
     public @NonNull TableDTO mapTableToTableDTO(@NonNull final Table table) {
 
         return new TableDTO(table.getId(),
+                table.getRound(),
                 table.getSpeaker(),
                 table.getPokerType(),
                 table.getSmallBlind(),

@@ -24,6 +24,9 @@ public class Table {
     // @SequenceGenerator(name = "t_seq_g", sequenceName = "tables_id_seq")
     private Long id;
 
+    @Column(name = "round", nullable = false)
+    private int round;
+
     @Enumerated(EnumType.STRING)
     @Column(name = "poker_type", nullable = false)
     private PokerType pokerType;

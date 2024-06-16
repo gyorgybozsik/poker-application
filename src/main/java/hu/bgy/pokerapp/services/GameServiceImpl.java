@@ -1,7 +1,8 @@
 package hu.bgy.pokerapp.services;
 
-import hu.bgy.pokerapp.dtos.TableSetupDTO;
+import hu.bgy.pokerapp.dtos.SpeakerActionDTO;
 import hu.bgy.pokerapp.dtos.TableDTO;
+import hu.bgy.pokerapp.dtos.TableSetupDTO;
 import hu.bgy.pokerapp.mappers.GameMapper;
 import hu.bgy.pokerapp.models.Table;
 import hu.bgy.pokerapp.repositories.TableRepo;
@@ -15,7 +16,7 @@ import java.util.Set;
 @RequiredArgsConstructor
 @Service
 public class GameServiceImpl implements GameService {
-    // private final TableServiceImpl<TexasHoldemRound, TexasHoldem> table;
+    private final TableServiceImpl tableService;
     private final GameMapper gameMapper;
     private final TableRepo tableRepo;
 
@@ -23,6 +24,13 @@ public class GameServiceImpl implements GameService {
     public @NonNull TableDTO createGame(@NonNull final TableSetupDTO tableSetup) {
         final Table table = gameMapper.mapTableSetupToTable(tableSetup);
         return gameMapper.mapTableToTableDTO(tableRepo.save(table));
+    }
+
+    @Override
+    public @NonNull TableDTO performTableSpeaker(@NonNull final SpeakerActionDTO speakerActionDTO, final long tableId) {
+        Table table = tableRepo.getReferenceById(tableId);
+        table = tableService.performTableSpeaker(table, speakerActionDTO);
+        return gameMapper.mapTableToTableDTO(table);
     }
 
     @Override

@@ -1,5 +1,6 @@
 package hu.bgy.pokerapp.services;
 
+import hu.bgy.pokerapp.dtos.SpeakerActionDTO;
 import hu.bgy.pokerapp.dtos.TableSetupDTO;
 import hu.bgy.pokerapp.dtos.TableDTO;
 import lombok.NonNull;
@@ -12,4 +13,6 @@ public interface GameService {
     Set<Long> getAllPokerTable();
 
     TableDTO loadGame(long tableId);
+
+    TableDTO performTableSpeaker(SpeakerActionDTO speakerActionDTO, long tableId);
 }

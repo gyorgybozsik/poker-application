@@ -1,5 +1,5 @@
 package hu.bgy.pokerapp.controllers;
-
+import hu.bgy.pokerapp.dtos.SpeakerActionDTO;
 import hu.bgy.pokerapp.dtos.TableSetupDTO;
 import hu.bgy.pokerapp.dtos.TableDTO;
 import hu.bgy.pokerapp.services.GameService;
@@ -37,5 +37,11 @@ public class GameController {
     @GetMapping("/load-table/{tableId}")
     public TableDTO loadTable(@PathVariable final long tableId){
         return gameService.loadGame(tableId);
+    }
+
+    @PutMapping("/table/{tableId}/speaker")
+    public TableDTO performTableSpeaker(@RequestBody SpeakerActionDTO speakerActionDTO,
+                                        @PathVariable long tableId) {
+        return gameService.performTableSpeaker(speakerActionDTO, tableId);
     }
 }

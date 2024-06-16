@@ -1,19 +1,35 @@
 package hu.bgy.pokerapp.services;
 
-import hu.bgy.pokerapp.models.round.Round;
-import hu.bgy.pokerapp.services.poker.Poker;
+import hu.bgy.pokerapp.dtos.SpeakerActionDTO;
+import hu.bgy.pokerapp.enums.PokerType;
+import hu.bgy.pokerapp.models.Table;
+import hu.bgy.pokerapp.models.poker.Poker;
 import hu.bgy.pokerapp.services.poker.TableService;
+import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+
+import java.util.List;
+import java.util.Set;
 
 @RequiredArgsConstructor
-public class TableServiceImpl<ROUND extends Round, POKER extends Poker<ROUND>> implements TableService {
-    private final POKER poker;
+@Service
+public class TableServiceImpl implements TableService {
+   final Set<Poker> pokerKinds ;
 
-    /**
-     * elsőnek feltöltjük valahogy a listát
-     * ennek a listának mindig a legelső eleme a kisvak
-     * a legutolsó eleme a dealer
-     * amikor kezdődik a kör, akkor végigmész a listán és egy másik dequeuejhoz hozzáadod sorrendben
-     * ha vége az adott menet, akkor itt lépteti eggyel az játokosokat
-     */
+   private Poker getPokerKind(final @NonNull PokerType pokerType) {
+      List<Poker> pokers = pokerKinds.stream().filter(poker -> poker.isPokerKind(pokerType)).toList();
+      if (pokers.size()!=1) throw new IllegalStateException();
+      return pokers.getFirst();
+   }
+
+   @Override
+   public @NonNull Table performTableSpeaker(@NonNull Table table, @NonNull SpeakerActionDTO speakerActionDTO) {
+       //todo ki kell szedni a playert
+      //todo meg kell nézni a player-e a speaker speakeractiondto player id
+      //todo update status és balance
+      //todo ki kell számolni a következő roundot és speakert
+
+      return null;
+   }
 }

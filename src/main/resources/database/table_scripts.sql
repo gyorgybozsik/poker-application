@@ -1,6 +1,7 @@
 CREATE TABLE tables
 (
     id          SERIAL PRIMARY KEY NOT NULL,
+    round       INT                NOT NULL,
     poker_type  VARCHAR(25)        NOT NULL,
     small_blind NUMERIC(10, 2)     NOT NULL,
     speaker     VARCHAR(25)        NOT NULL

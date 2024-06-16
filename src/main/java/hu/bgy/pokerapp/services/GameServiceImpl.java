@@ -9,6 +9,9 @@ import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+import java.util.Set;
+
 @RequiredArgsConstructor
 @Service
 public class GameServiceImpl implements GameService {
@@ -20,5 +23,16 @@ public class GameServiceImpl implements GameService {
     public @NonNull TableDTO createGame(@NonNull final TableSetupDTO tableSetup) {
         final Table table = gameMapper.mapTableSetupToTable(tableSetup);
         return gameMapper.mapTableToTableDTO(tableRepo.save(table));
+    }
+
+    @Override
+    public TableDTO loadGame(long tableId) {
+        return gameMapper.mapTableToTableDTO(tableRepo.getReferenceById(tableId));
+    }
+
+    @Override
+    public Set<Long> getAllPokerTable() {
+        final List<Table> tables = tableRepo.findAll();
+        return gameMapper.mapTablesToIDs(tables);
     }
 }

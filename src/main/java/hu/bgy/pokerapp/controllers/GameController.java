@@ -8,6 +8,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Set;
+
 @Slf4j
 @RequiredArgsConstructor
 @RequestMapping(path = "/v1/game")
@@ -25,5 +27,15 @@ public class GameController {
     @PostMapping(value = "/create")
     public TableDTO creatPokerGame(@RequestBody @NonNull final TableSetupDTO tableSetup) {
         return gameService.createGame(tableSetup);
+    }
+
+    @GetMapping("/all/poker-game")
+    public Set<Long> getAllPokerGame() {
+        return gameService.getAllPokerTable();
+    }
+
+    @GetMapping("/load-table/{tableId}")
+    public TableDTO loadTable(@PathVariable final long tableId){
+        return gameService.loadGame(tableId);
     }
 }

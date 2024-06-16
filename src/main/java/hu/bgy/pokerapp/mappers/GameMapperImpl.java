@@ -12,8 +12,8 @@ import lombok.NonNull;
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Component
 public class GameMapperImpl implements GameMapper {
@@ -44,7 +44,7 @@ public class GameMapperImpl implements GameMapper {
             @NonNull PlayerDTO playerDTO,
             @NonNull BigDecimal cash,
             @NonNull RoundRole roundRole
-            ) {
+    ) {
         return new Player(playerDTO.name(), cash, roundRole);
     }
 
@@ -70,6 +70,11 @@ public class GameMapperImpl implements GameMapper {
 
     private BalanceDTO mapBalanceToBalanceDTO(Balance balance) {
         //return new BalanceDTO(balance.getCash(), balance.getBet());
-    return BalanceDTO.builder().cash(balance.getCash()).bet(balance.getBet()).build();
+        return BalanceDTO.builder().cash(balance.getCash()).bet(balance.getBet()).build();
+    }
+
+    @Override
+    public Set<Long> mapTablesToIDs(final @NonNull List<Table> tables) {
+        return tables.stream().map(Table::getId).collect(Collectors.toSet());
     }
 }

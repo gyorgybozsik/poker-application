@@ -46,3 +46,8 @@ public class Table {
         speaker = SPEAKER_1;
     }
 }
+//todo long ID --> uuid
+// adatbázis script serial heylet uuid,
+// UUid generálás megvalósítása
+// postgesql uuid generálás<-keresés
+

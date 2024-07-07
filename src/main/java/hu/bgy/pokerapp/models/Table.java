@@ -11,7 +11,7 @@ import lombok.NonNull;
 import java.math.BigDecimal;
 import java.util.List;
 
-import static hu.bgy.pokerapp.enums.RoundRole.SPEAKER_1;
+import static hu.bgy.pokerapp.enums.RoundRole.*;
 
 
 @Data
@@ -41,12 +41,26 @@ public class Table {
     @Column(name = "speaker", nullable = false)
     private RoundRole speaker;
 
+    @Enumerated(EnumType.STRING)
+    @Column(name = "after_last", nullable = false)
+    private RoundRole afterLast;
+
+    public void setSeats(List<Player> seats) {
+        this.seats = seats;
+        if (seats.size() == 2) {
+            speaker = RoundRole.SMALL_BLIND;
+            afterLast = SMALL_BLIND;
+        } else {
+            speaker = SPEAKER_1;
+            afterLast = SPEAKER_1;
+        }
+
+    }
 
     public Table(@NonNull final PokerType pokerType,
                  @NonNull final BigDecimal smallBlind) {
         this.pokerType = pokerType;
         this.smallBlind = smallBlind;
-        speaker = SPEAKER_1;
     }
 }
 //todo long ID --> uuid

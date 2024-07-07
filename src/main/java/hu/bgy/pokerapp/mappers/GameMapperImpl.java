@@ -1,12 +1,10 @@
 package hu.bgy.pokerapp.mappers;
 
-import hu.bgy.pokerapp.dtos.BalanceDTO;
-import hu.bgy.pokerapp.dtos.PlayerDTO;
-import hu.bgy.pokerapp.dtos.TableDTO;
-import hu.bgy.pokerapp.dtos.TableSetupDTO;
+import hu.bgy.pokerapp.dtos.*;
 import hu.bgy.pokerapp.enums.RoundRole;
 import hu.bgy.pokerapp.models.Balance;
 import hu.bgy.pokerapp.models.Player;
+import hu.bgy.pokerapp.models.PlayerState;
 import hu.bgy.pokerapp.models.Table;
 import lombok.NonNull;
 import org.springframework.stereotype.Component;
@@ -66,7 +64,14 @@ public class GameMapperImpl implements GameMapper {
     }
 
     private PlayerDTO mapPlayerToPlayerDTO(Player player) {
-        return new PlayerDTO(player.getName(), mapBalanceToBalanceDTO(player.getBalance()));
+        return new PlayerDTO(
+                player.getName(),
+                mapBalanceToBalanceDTO(player.getBalance()),
+                mapPlayerStateToPlayerStateDTO(player.getState()));
+    }
+
+    private PlayerStateDTO mapPlayerStateToPlayerStateDTO(PlayerState playerState) {
+        return PlayerStateDTO.builder().inGameState(playerState.getInGameState()).roundRole(playerState.getRoundRole()).build();
     }
 
     private BalanceDTO mapBalanceToBalanceDTO(Balance balance) {

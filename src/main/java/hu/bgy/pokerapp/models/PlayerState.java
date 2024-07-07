@@ -7,6 +7,7 @@ import jakarta.persistence.Table;
 import lombok.AccessLevel;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.NonNull;
 
 @Data
 @Entity
@@ -23,8 +24,8 @@ public class PlayerState {
     @JoinColumn(name = "player_id", referencedColumnName = "id", nullable = false)
     private Player player;
 
-   // @Column(name = "table_id", nullable = false)
-   // private Long tableId;
+    // @Column(name = "table_id", nullable = false)
+    // private Long tableId;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "in_game_state", nullable = false)
@@ -38,5 +39,9 @@ public class PlayerState {
         inGameState = InGameState.ACTIVE;
         this.roundRole = roundRole;
         this.player = player;
+    }
+
+    public boolean isActiveRoundRole(@NonNull RoundRole roundRole) {
+        return inGameState == InGameState.ACTIVE && roundRole == this.roundRole;
     }
 }

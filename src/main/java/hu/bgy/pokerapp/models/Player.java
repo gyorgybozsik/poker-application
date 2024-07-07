@@ -45,6 +45,10 @@ public class Player {
         state = new PlayerState(this,roundRole);
     }
 
+    public void fold() {
+        this.state.setInGameState(InGameState.SIT_OUT);
+    }
+
     public boolean isActive() {
         return InGameState.ACTIVE.equals(state);
     }

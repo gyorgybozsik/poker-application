@@ -6,6 +6,6 @@ import lombok.NonNull;
 
 public interface TableService {
     @NonNull Table performTableSpeaker(final @NonNull Table table,
-                                       final @NonNull SpeakerActionDTO speakerActionDTO);
+                                          final @NonNull SpeakerActionDTO speakerActionDTO);
 
 }

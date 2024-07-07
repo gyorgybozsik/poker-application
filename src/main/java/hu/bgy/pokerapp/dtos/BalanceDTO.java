@@ -6,6 +6,7 @@ import lombok.NonNull;
 import java.math.BigDecimal;
 
 @Builder
-public record BalanceDTO(@NonNull BigDecimal cash, @NonNull BigDecimal bet) {
+public record BalanceDTO(@NonNull BigDecimal cash,
+                         @NonNull BigDecimal bet) {
 
 }

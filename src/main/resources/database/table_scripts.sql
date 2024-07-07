@@ -4,7 +4,8 @@ CREATE TABLE tables
     round       INT                NOT NULL,
     poker_type  VARCHAR(25)        NOT NULL,
     small_blind NUMERIC(10, 2)     NOT NULL,
-    speaker     VARCHAR(25)        NOT NULL
+    speaker     VARCHAR(25)        NOT NULL,
+    after_last  VARCHAR(25)        NOT NULL
 );
 
 CREATE TABLE balances

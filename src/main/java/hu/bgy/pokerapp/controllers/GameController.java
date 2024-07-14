@@ -9,6 +9,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Set;
+import java.util.UUID;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -30,18 +31,18 @@ public class GameController {
     }
 
     @GetMapping("/all/poker-game")
-    public Set<Long> getAllPokerGame() {
+    public Set<UUID> getAllPokerGame() {
         return gameService.getAllPokerTable();
     }
 
     @GetMapping("/load-table/{tableId}")
-    public TableDTO loadTable(@PathVariable final long tableId){
+    public TableDTO loadTable(@PathVariable final UUID tableId){
         return gameService.loadGame(tableId);
     }
 
     @PutMapping("/table/{tableId}/speaker")
     public TableDTO performTableSpeaker(@RequestBody SpeakerActionDTO speakerActionDTO,
-                                        @PathVariable long tableId) {
+                                        @PathVariable UUID tableId) {
         return gameService.performTableSpeaker(speakerActionDTO, tableId);
     }
 }

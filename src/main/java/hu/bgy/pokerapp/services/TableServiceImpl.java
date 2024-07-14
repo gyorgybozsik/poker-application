@@ -35,10 +35,12 @@ public class TableServiceImpl implements TableService {
                 .filter(player1 -> player1.getId().equals(speakerActionDTO.playerId()))
                 .findFirst().orElseThrow(IllegalStateException::new);
         switch (speakerActionDTO.playerAction()) {
-            case CHECK ->
-            case CALL ->
-            case RAISE ->
-            case FOLD -> {player.fold(); nextSpeaker(table);
+            case CHECK -> nextSpeaker(table);
+            case CALL -> nextSpeaker(table);
+          //  case RAISE ->
+            case FOLD -> {
+                player.fold();
+                nextSpeaker(table);
             }
         }
 
@@ -51,13 +53,12 @@ public class TableServiceImpl implements TableService {
 
     public RoundRole nextSpeaker(final @NonNull Table table) {
         RoundRole[] roundRoles = RoundRole.values();
-
         for (int i = table.getSpeaker().ordinal() + 1; i < roundRoles.length; i++) {
             RoundRole roundRole = roundRoles[i];
             if (table.getSeats().stream().anyMatch(player -> player.getState().isActiveRoundRole(roundRole))) {
                 return roundRole;
             }
         }
-
+        return null;
     }
 }

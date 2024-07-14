@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Set;
+import java.util.UUID;
 
 @RequiredArgsConstructor
 @Service
@@ -27,19 +28,19 @@ public class GameServiceImpl implements GameService {
     }
 
     @Override
-    public @NonNull TableDTO performTableSpeaker(@NonNull final SpeakerActionDTO speakerActionDTO, final long tableId) {
+    public @NonNull TableDTO performTableSpeaker(@NonNull final SpeakerActionDTO speakerActionDTO, final UUID tableId) {
         Table table = tableRepo.getReferenceById(tableId);
         table = tableService.performTableSpeaker(table, speakerActionDTO);
         return gameMapper.mapTableToTableDTO(table);
     }
 
     @Override
-    public TableDTO loadGame(long tableId) {
+    public TableDTO loadGame(UUID tableId) {
         return gameMapper.mapTableToTableDTO(tableRepo.getReferenceById(tableId));
     }
 
     @Override
-    public Set<Long> getAllPokerTable() {
+    public Set<UUID> getAllPokerTable() {
         final List<Table> tables = tableRepo.findAll();
         return gameMapper.mapTablesToIDs(tables);
     }

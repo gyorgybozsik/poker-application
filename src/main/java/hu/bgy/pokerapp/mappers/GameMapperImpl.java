@@ -80,7 +80,7 @@ public class GameMapperImpl implements GameMapper {
     }
 
     @Override
-    public Set<Long> mapTablesToIDs(final @NonNull List<Table> tables) {
+    public Set<UUID> mapTablesToIDs(final @NonNull List<Table> tables) {
         return tables.stream().map(Table::getId).collect(Collectors.toSet());
     }
 }

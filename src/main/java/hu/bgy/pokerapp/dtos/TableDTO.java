@@ -7,7 +7,7 @@ import java.math.BigDecimal;
 import java.util.List;
 
 public record TableDTO(//UUID uuid,
-                       long id,
+                       java.util.UUID id,
                        int round,
                        RoundRole speaker,
                        PokerType pokerType,

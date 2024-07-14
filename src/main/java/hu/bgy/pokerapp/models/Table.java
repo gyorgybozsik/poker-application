@@ -10,6 +10,7 @@ import lombok.NonNull;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.UUID;
 
 import static hu.bgy.pokerapp.enums.RoundRole.*;
 
@@ -20,9 +21,9 @@ import static hu.bgy.pokerapp.enums.RoundRole.*;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Table {
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE)
+    @GeneratedValue(strategy = GenerationType.UUID)
     // @SequenceGenerator(name = "t_seq_g", sequenceName = "tables_id_seq")
-    private Long id;
+    private UUID id;
 
     @Column(name = "round", nullable = false)
     private int round;

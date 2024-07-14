@@ -6,13 +6,14 @@ import hu.bgy.pokerapp.dtos.TableDTO;
 import lombok.NonNull;
 
 import java.util.Set;
+import java.util.UUID;
 
 public interface GameService {
     @NonNull TableDTO createGame(@NonNull final TableSetupDTO tableSetup);
 
-    Set<Long> getAllPokerTable();
+    Set<UUID> getAllPokerTable();
 
-    TableDTO loadGame(long tableId);
+    TableDTO loadGame(UUID tableId);
 
-    TableDTO performTableSpeaker(SpeakerActionDTO speakerActionDTO, long tableId);
+    TableDTO performTableSpeaker(SpeakerActionDTO speakerActionDTO, UUID tableId);
 }

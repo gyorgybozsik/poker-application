@@ -12,7 +12,8 @@ import java.math.BigDecimal;
 import java.util.List;
 import java.util.UUID;
 
-import static hu.bgy.pokerapp.enums.RoundRole.*;
+import static hu.bgy.pokerapp.enums.RoundRole.SMALL_BLIND;
+import static hu.bgy.pokerapp.enums.RoundRole.SPEAKER_1;
 
 
 @Data
@@ -62,6 +63,32 @@ public class Table {
                  @NonNull final BigDecimal smallBlind) {
         this.pokerType = pokerType;
         this.smallBlind = smallBlind;
+    }
+
+    public BigDecimal getBigBlind() {
+        return smallBlind.multiply(BigDecimal.TWO);
+    }
+
+    public Player getSpeakerPlayer() {
+        return seats
+                .stream()
+                .filter(player1 -> player1.getState().getRoundRole() == speaker)
+                .findFirst().orElseThrow(IllegalStateException::new);
+    }
+
+    public Player getLastRaiserPlayer() {
+        return seats
+                .stream()
+                .filter(player1 -> player1.getState().getRoundRole() == afterLast)
+                .findFirst().orElseThrow(IllegalStateException::new);
+    }
+
+    public Player getPlayer(final long id) {
+        return seats
+                .stream()
+                .filter(player1 -> player1.getId().equals(id))
+                .findFirst().orElseThrow(IllegalStateException::new);
+
     }
 }
 //todo long ID --> uuid

@@ -2,10 +2,7 @@ package hu.bgy.pokerapp.models;
 
 import jakarta.persistence.*;
 import jakarta.persistence.Table;
-import lombok.AccessLevel;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import lombok.NonNull;
+import lombok.*;
 
 import java.math.BigDecimal;
 
@@ -24,7 +21,8 @@ public class Balance {
 
     @Column(name = "bet")
     private BigDecimal bet;
-    @OneToOne (mappedBy = "balance")
+
+    @OneToOne(mappedBy = "balance")
     private Player player;
 
     public Balance(BigDecimal cash) {
@@ -42,5 +40,11 @@ public class Balance {
         }
 
     }
+
+    public boolean hasCash() {
+        return cash.compareTo(BigDecimal.ZERO) > 0;
+    }
 }
+
+
 //todo táblák létrehozása és összekapcsolása a hogyhívják kóddal :P

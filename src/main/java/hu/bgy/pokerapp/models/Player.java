@@ -18,7 +18,7 @@ import java.math.BigDecimal;
 public class Player {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
-  //  @SequenceGenerator(name = "p_seq_g", sequenceName = "players_id_seq")
+    //  @SequenceGenerator(name = "p_seq_g", sequenceName = "players_id_seq")
     private Long id;
 
     @Column(name = "name", nullable = false)
@@ -42,7 +42,11 @@ public class Player {
         this.name = name;
         this.balance = new Balance(cash);
         balance.setPlayer(this);
-        state = new PlayerState(this,roundRole);
+        state = new PlayerState(this, roundRole);
+    }
+
+    public boolean isSpeakable(@NonNull final RoundRole role) {
+        return state.isActiveRoundRole(role) && balance.hasCash();
     }
 
     public void fold() {

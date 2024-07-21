@@ -17,7 +17,7 @@ public record SpeakerActionDTO(@NonNull Long playerId,
         this.playerAction = playerAction;
         switch (playerAction) {
             case RAISE, CALL -> {
-                if (BigDecimal.ZERO.compareTo(changeAmount) < 0)
+                if (BigDecimal.ZERO.compareTo(changeAmount) > 0)
                     throw new IllegalArgumentException();
                 this.changeAmount = changeAmount;
             }

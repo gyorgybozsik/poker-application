@@ -38,35 +38,35 @@ public class TableServiceImpl implements TableService {
         }
         switch (speakerActionDTO.playerAction()) {
             case CHECK -> {
-                if (raiser.getBalance().getBet().compareTo(speaker.getBalance().getBet()) != 0) {
-                    throw new IllegalStateException("checker should have same amount as raiser");
-                }
-                nextSpeaker(table);
+               // if (raiser.getBalance().getBet().compareTo(speaker.getBalance().getBet()) != 0) {
+               //     throw new IllegalStateException("checker should have same amount as raiser");
+               // }
+                table.setSpeaker(nextSpeaker(table));
             }
             case CALL -> {
-                if (!(((raiser.getBalance().getBet().max(table.getBigBlind()).compareTo(speaker.getBalance().getBet().add(speakerActionDTO.changeAmount())) == 0 && table.getRound() == 0) ||
-                        (raiser.getBalance().getBet().compareTo(speaker.getBalance().getBet().add(speakerActionDTO.changeAmount())) == 0 && table.getRound() != 0)
-                ) ||
-                        speakerActionDTO.changeAmount().compareTo(speaker.getBalance().getCash()) == 0)
-                ) {
-                    throw new IllegalStateException("this caller is not a caller");
-                }
+              //  if (!(((raiser.getBalance().getBet().max(table.getBigBlind()).compareTo(speaker.getBalance().getBet().add(speakerActionDTO.changeAmount())) == 0 && table.getRound() == 0) ||
+              //          (raiser.getBalance().getBet().compareTo(speaker.getBalance().getBet().add(speakerActionDTO.changeAmount())) == 0 && table.getRound() != 0)
+              //  ) ||
+              //          speakerActionDTO.changeAmount().compareTo(speaker.getBalance().getCash()) == 0)
+              //  ) {
+              //      throw new IllegalStateException("this caller is not a caller");
+              //  }
                 speaker.bet(speakerActionDTO.changeAmount());
-                nextSpeaker(table);
+                table.setSpeaker(nextSpeaker(table));
             }
             case RAISE -> {
-                if (!(speakerActionDTO.changeAmount().compareTo(table.getBigBlind().max(raiser.getBalance().getBet().subtract(speaker.getBalance().getBet()))) < 0 ||
-                        (speakerActionDTO.changeAmount().compareTo(speaker.getBalance().getCash()) == 0 &&
-                                raiser.getBalance().getBet().compareTo(speakerActionDTO.changeAmount().add(speaker.getBalance().getBet())) < 1))) {
-                    throw new IllegalStateException("not valid amount");
-                }
+               // if (!(speakerActionDTO.changeAmount().compareTo(table.getBigBlind().max(raiser.getBalance().getBet().subtract(speaker.getBalance().getBet()))) < 0 ||
+               //         (speakerActionDTO.changeAmount().compareTo(speaker.getBalance().getCash()) == 0 &&
+               //                 raiser.getBalance().getBet().compareTo(speakerActionDTO.changeAmount().add(speaker.getBalance().getBet())) < 1))) {
+               //     throw new IllegalStateException("not valid amount");
+               // }
                 speaker.bet(speakerActionDTO.changeAmount());
                 table.setAfterLast(speaker.getState().getRoundRole());
-                nextSpeaker(table);
+                table.setSpeaker(nextSpeaker(table));
             }
             case FOLD -> {
                 player.fold();
-                nextSpeaker(table);
+                table.setSpeaker(nextSpeaker(table));
             }
         }
 
@@ -74,16 +74,12 @@ public class TableServiceImpl implements TableService {
         //todo update status és balance
         //todo ki kell számolni a következő roundot és speakert
 
-        return null;
+        return table;
     }
 
 
     public RoundRole nextSpeaker(final @NonNull Table table) {
-        RoundRole[] roundRoles = RoundRole.values();
-        //todo meg kell csinálni a körbemenetelt és h az afterlast speakerig kell mennie
-
-        for (int i = table.getSpeaker().ordinal() + 1; i < roundRoles.length; i++) {
-            RoundRole roundRole = roundRoles[i];
+        for (RoundRole roundRole = table.getSpeaker().nextRole(); roundRole != table.getAfterLast(); roundRole.nextRole()) {
             if (table.getSeats().stream().anyMatch(player -> player.isSpeakable(roundRole))) {
                 return roundRole;
             }
@@ -91,3 +87,5 @@ public class TableServiceImpl implements TableService {
         return null;
     }
 }
+// írd át ezt az egy metódust
+///todo TESZTET a round role nextRole() metódusra

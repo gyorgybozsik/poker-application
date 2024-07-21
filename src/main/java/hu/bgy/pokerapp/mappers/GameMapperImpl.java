@@ -65,6 +65,7 @@ public class GameMapperImpl implements GameMapper {
 
     private PlayerDTO mapPlayerToPlayerDTO(Player player) {
         return new PlayerDTO(
+                player.getId(),
                 player.getName(),
                 mapBalanceToBalanceDTO(player.getBalance()),
                 mapPlayerStateToPlayerStateDTO(player.getState()));

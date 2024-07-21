@@ -11,6 +11,10 @@ public enum RoundRole {
     SPEAKER_5,
     SPEAKER_6,
     SPEAKER_7,
+    ;
 
-
+    public RoundRole nextRole() {
+        RoundRole[] roundRoles = RoundRole.values();
+        return roundRoles[(this.ordinal() + 1) % roundRoles.length];
+    }
 }

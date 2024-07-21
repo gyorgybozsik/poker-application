@@ -5,6 +5,7 @@ import jakarta.persistence.Table;
 import lombok.*;
 
 import java.math.BigDecimal;
+import java.util.UUID;
 
 @Data
 @Entity
@@ -12,9 +13,9 @@ import java.math.BigDecimal;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Balance {
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE)
+    @GeneratedValue(strategy = GenerationType.UUID)
     // @SequenceGenerator(name = "b_seq_g", sequenceName = "balances_id_seq")
-    private Long id;
+    private UUID id;
 
     @Column(name = "cash")
     private BigDecimal cash;

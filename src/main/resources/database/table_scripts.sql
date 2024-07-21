@@ -11,7 +11,7 @@ CREATE TABLE tables
 
 CREATE TABLE balances
 (
-    id   SERIAL PRIMARY KEY,
+    id   uuid DEFAULT uuid_generate_v4() PRIMARY KEY,
     cash NUMERIC(10, 2),
     bet  NUMERIC(10, 2)
 );
@@ -20,7 +20,7 @@ CREATE TABLE players
 (
     id         SERIAL PRIMARY KEY NOT NULL,
     name       VARCHAR(25)        NOT NULL,
-    balance_id INT                NOT NULL,
+    balance_id uuid                NOT NULL,
     table_id   uuid                NOT NULL,
     constraint p_balance_id_to_b_id foreign key (balance_id) references balances (id),
     constraint p_table_id_to_t_id foreign key (table_id) references tables (id)

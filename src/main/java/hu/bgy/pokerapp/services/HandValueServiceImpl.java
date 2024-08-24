@@ -128,7 +128,7 @@ public class HandValueServiceImpl implements HandValueService {
     private boolean isStraight(@NonNull final Hand hand) {
         final List<Rank> ranks = hand.getCards()
                 .stream()
-                .map(Card::rank)
+                .map(Card::getRank)
                 .collect(Collectors.toSet())
                 .stream()
                 .sorted()
@@ -180,7 +180,7 @@ public class HandValueServiceImpl implements HandValueService {
                 Rank.getHighest() :
                 highestHands.stream()
                         .map(SortedSet::getFirst)
-                        .map(Card::rank)
+                        .map(Card::getRank)
                         .max(Comparator.naturalOrder())
                         .orElseThrow(IllegalArgumentException::new);
 
@@ -229,10 +229,10 @@ public class HandValueServiceImpl implements HandValueService {
                     .findFirst()
                     .orElseThrow(IllegalArgumentException::new)
                     .getFirst()
-                    .rank();
+                    .getRank();
             final Rank currentHighest = highestHand
                     .getFirst()
-                    .rank();
+                    .getRank();
             if (currentHighest.isHigher(previousHighest)) {
                 highestHands.clear();
                 highestHands.add(highestHand);
@@ -269,7 +269,7 @@ public class HandValueServiceImpl implements HandValueService {
             @NonNull final Symbol symbol,
             @NonNull final Rank rank) {
         return hand.getCards().stream()
-                .filter(card -> card.rank() == rank && card.symbol() == symbol)
+                .filter(card -> card.getRank() == rank && card.getSymbol() == symbol)
                 .findFirst()
                 .orElseThrow(IllegalArgumentException::new);
     }
@@ -309,7 +309,7 @@ public class HandValueServiceImpl implements HandValueService {
         final Map<List<Card>, Integer> cardOccurrences = new HashMap<>();
         for (Map.Entry<Rank, Integer> entry : map.entrySet()) {
             List<Card> collections = hand.getCards().stream()
-                    .filter(card -> card.rank().equals(entry.getKey()))
+                    .filter(card -> card.getRank().equals(entry.getKey()))
                     .toList();
             cardOccurrences.put(collections, entry.getValue());
             sizeOfFigure += entry.getValue();
@@ -398,14 +398,14 @@ public class HandValueServiceImpl implements HandValueService {
     private static List<List<Card>> getNominatedHighCards(@NonNull final TreeSet<Card> remainingCards) {
         final Map<Rank, List<Card>> cardsByRank = new TreeMap<>();
         remainingCards.forEach(card -> {
-            if (cardsByRank.containsKey(card.rank())) {
-                final List<Card> cards = cardsByRank.get(card.rank());
+            if (cardsByRank.containsKey(card.getRank())) {
+                final List<Card> cards = cardsByRank.get(card.getRank());
                 cards.add(card);
-                cardsByRank.put(card.rank(), cards);
+                cardsByRank.put(card.getRank(), cards);
             } else {
                 final List<Card> cards = new ArrayList<>();
                 cards.add(card);
-                cardsByRank.put(card.rank(), cards);
+                cardsByRank.put(card.getRank(), cards);
             }
         });
 
@@ -460,7 +460,7 @@ public class HandValueServiceImpl implements HandValueService {
         final List<Card> line = new HashSet<>(hand.getCards()).stream().sorted().toList();
         IntStream
                 .range(0, line.size() - 4)
-                .filter(i -> line.get(i).rank().distance(line.get(i + 4).rank()) == 4)
+                .filter(i -> line.get(i).getRank().distance(line.get(i + 4).getRank()) == 4)
                 .mapToObj(i -> new TreeSet<>(line.subList(i, i + 5)))
                 .forEach(highestHand -> handleHighestHand(highestHand, highestHands, false));
         return highestHands;

@@ -9,7 +9,9 @@ import lombok.NoArgsConstructor;
 import lombok.NonNull;
 
 import java.math.BigDecimal;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 import static hu.bgy.pokerapp.enums.RoundRole.SMALL_BLIND;
@@ -47,6 +49,14 @@ public class Table {
     @Column(name = "after_last", nullable = false)
     private RoundRole afterLast;
 
+    @OneToMany
+ //   @JoinTable(
+ //           name = "card_owners",
+ //           joinColumns = @JoinColumn(name = "table_id"),
+ //           inverseJoinColumns = @JoinColumn(name = "card_id")
+ //   )
+    private Set<CardOwner> cards = new HashSet<>();
+
     public void setSeats(List<Player> seats) {
         this.seats = seats;
         if (seats.size() == 2) {
@@ -83,12 +93,27 @@ public class Table {
                 .findFirst().orElseThrow(IllegalStateException::new);
     }
 
-    public Player getPlayer(final long id) {
+    public Player getPlayer(final UUID id) {
         return seats
                 .stream()
                 .filter(player1 -> player1.getId().equals(id))
                 .findFirst().orElseThrow(IllegalStateException::new);
+    }
 
+    public Set<Card> getCards() {
+        Set<Card> set = new HashSet<>();
+        for (CardOwner card : cards) {
+            Card cardOwnerCard = card.getCard();
+            set.add(cardOwnerCard);
+        }
+        return set;
+    }
+   // public Set<Card> getCards() {
+   //     return cards.stream().map(CardOwner::getCard).collect(Collectors.toSet());
+   // }
+
+    public List<Player> getActivePlayers() {
+        return seats.stream().filter(Player::isActive).toList();
     }
 }
 //todo long ID --> uuid

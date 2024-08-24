@@ -2,6 +2,7 @@ package hu.bgy.pokerapp.controllers;
 import hu.bgy.pokerapp.dtos.SpeakerActionDTO;
 import hu.bgy.pokerapp.dtos.TableSetupDTO;
 import hu.bgy.pokerapp.dtos.TableDTO;
+import hu.bgy.pokerapp.exceptions.ValidationException;
 import hu.bgy.pokerapp.services.GameService;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
@@ -42,7 +43,7 @@ public class GameController {
 
     @PutMapping("/table/{tableId}/speaker")
     public TableDTO performTableSpeaker(@RequestBody SpeakerActionDTO speakerActionDTO,
-                                        @PathVariable UUID tableId) {
+                                        @PathVariable UUID tableId) throws ValidationException {
         return gameService.performTableSpeaker(speakerActionDTO, tableId);
     }
 }

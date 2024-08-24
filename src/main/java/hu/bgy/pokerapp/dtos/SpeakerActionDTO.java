@@ -4,13 +4,14 @@ import hu.bgy.pokerapp.enums.PlayerAction;
 import lombok.NonNull;
 
 import java.math.BigDecimal;
+import java.util.UUID;
 
-public record SpeakerActionDTO(@NonNull Long playerId,
+public record SpeakerActionDTO(@NonNull UUID playerId,
                                @NonNull PlayerAction playerAction,
                                @NonNull BigDecimal changeAmount) {
 
     public SpeakerActionDTO(
-            @NonNull Long playerId,
+            @NonNull UUID playerId,
             @NonNull PlayerAction playerAction,
             @NonNull BigDecimal changeAmount) {
         this.playerId = playerId;

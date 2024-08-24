@@ -1,26 +1,54 @@
 package hu.bgy.pokerapp.models;
 
-import lombok.Getter;
+import jakarta.persistence.Table;
+import jakarta.persistence.*;
+import lombok.AccessLevel;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.util.TreeSet;
+import java.util.UUID;
+import java.util.stream.Collectors;
 
 import static org.springframework.util.CollectionUtils.isEmpty;
 
-@Getter
+@Entity
+@Table (name = "hands")
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Data
 public class Hand {
-    private final TreeSet<Card> cards;
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.UUID)
+    private UUID id;
+
+    @OneToMany
+  //  @JoinTable(
+  //          name = "card_owners",
+  //          joinColumns = @JoinColumn(name = "player_id"),
+  //          inverseJoinColumns = @JoinColumn(name = "card_id")
+  //  )
+    private TreeSet<CardOwner> cardOwners = new TreeSet<>();
+
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "player_id", referencedColumnName = "id", nullable = false)
+    private Player player;
+
+
+
+    @Transient
     @Setter
     private HandEvaluation latestHandEvaluation;
 
-    public Hand(final TreeSet<Card> cards) {
-        this.cards = cards;
+    public Hand(final TreeSet<CardOwner> cardOwners) {
+        this.cardOwners = cardOwners;
         validate();
     }
 
 
     public void validate() {
-        if (isEmpty(cards) || cards.size() < 5) {
+        if (isEmpty(cardOwners) || cardOwners.size() < 5) {
             throw new IllegalArgumentException();
         }
     }
@@ -30,5 +58,9 @@ public class Hand {
             throw new IllegalStateException("Latest hand evaluation is not initialized");
         }
         return latestHandEvaluation.getHandState();
+    }
+
+    public TreeSet<Card> getCards() {
+        return cardOwners.stream().map(CardOwner::getCard).collect(Collectors.toCollection(TreeSet::new));
     }
 }

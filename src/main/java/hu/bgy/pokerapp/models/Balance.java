@@ -23,6 +23,7 @@ public class Balance {
     @Column(name = "bet")
     private BigDecimal bet;
 
+    @ToString.Exclude
     @OneToOne(mappedBy = "balance")
     private Player player;
 

@@ -3,6 +3,7 @@ package hu.bgy.pokerapp.services;
 import hu.bgy.pokerapp.dtos.SpeakerActionDTO;
 import hu.bgy.pokerapp.dtos.TableDTO;
 import hu.bgy.pokerapp.dtos.TableSetupDTO;
+import hu.bgy.pokerapp.exceptions.ValidationException;
 import hu.bgy.pokerapp.mappers.GameMapper;
 import hu.bgy.pokerapp.models.Table;
 import hu.bgy.pokerapp.repositories.TableRepo;
@@ -28,9 +29,10 @@ public class GameServiceImpl implements GameService {
     }
 
     @Override
-    public @NonNull TableDTO performTableSpeaker(@NonNull final SpeakerActionDTO speakerActionDTO, final UUID tableId) {
+    public @NonNull TableDTO performTableSpeaker(@NonNull final SpeakerActionDTO speakerActionDTO, final UUID tableId) throws ValidationException {
         Table table = tableRepo.getReferenceById(tableId);
         table = tableService.performTableSpeaker(table, speakerActionDTO);
+        tableRepo.save(table);
         return gameMapper.mapTableToTableDTO(table);
     }
 

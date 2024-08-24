@@ -2,10 +2,29 @@ package hu.bgy.pokerapp.models;
 
 import hu.bgy.pokerapp.enums.Rank;
 import hu.bgy.pokerapp.enums.Symbol;
-import lombok.NonNull;
+import jakarta.persistence.Table;
+import jakarta.persistence.*;
+import lombok.*;
 
-public record Card(Symbol symbol,
-                   Rank rank) implements Comparable<Card> {
+import java.util.UUID;
+
+@Table(name = "cards")
+@Entity
+@RequiredArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor
+@Getter
+public class Card implements Comparable<Card> {
+    @Id
+    @GeneratedValue(strategy = GenerationType.UUID)
+    private UUID id;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "symbol", nullable = false)
+    private Symbol symbol;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "rank", nullable = false)
+    private Rank rank;
 
     public boolean isHighest() {
         return rank.isHighest();

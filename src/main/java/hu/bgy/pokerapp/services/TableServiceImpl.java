@@ -1,8 +1,10 @@
 package hu.bgy.pokerapp.services;
 
+import hu.bgy.pokerapp.components.TableValidator;
 import hu.bgy.pokerapp.dtos.SpeakerActionDTO;
 import hu.bgy.pokerapp.enums.PokerType;
 import hu.bgy.pokerapp.enums.RoundRole;
+import hu.bgy.pokerapp.exceptions.ValidationException;
 import hu.bgy.pokerapp.models.Player;
 import hu.bgy.pokerapp.models.Table;
 import hu.bgy.pokerapp.models.poker.Poker;
@@ -12,11 +14,13 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 @RequiredArgsConstructor
 @Service
 public class TableServiceImpl implements TableService {
+    private final TableValidator tableValidator;
     final Set<Poker> pokerKinds;
 
     private Poker getPokerKind(final @NonNull PokerType pokerType) {
@@ -26,66 +30,95 @@ public class TableServiceImpl implements TableService {
     }
 
     @Override
-    public @NonNull Table performTableSpeaker(@NonNull Table table, @NonNull SpeakerActionDTO speakerActionDTO) {
-        //todo később validáld le hogya  tableban lévő player megeggyezik e a speakeractionben lévő playyerrel
-        //todo meg kell nézni a player-e a speaker speakeractiondto player id
-
-        Player raiser = table.getLastRaiserPlayer();
-        Player speaker = table.getSpeakerPlayer();
-        Player player = table.getPlayer(speakerActionDTO.playerId());
-        if (speaker != player) {
-            throw new IllegalStateException("Speaker not equals with speaker action");
+    public @NonNull Table performTableSpeaker(@NonNull Table table, @NonNull SpeakerActionDTO speakerActionDTO) throws ValidationException {
+        List<String> massages = tableValidator.validateSpeakerAction(table, speakerActionDTO);
+        if (!massages.isEmpty()) {
+            throw new ValidationException(massages);
         }
+        Player player = table.getPlayer(speakerActionDTO.playerId());
+        Player speaker = table.getSpeakerPlayer();
         switch (speakerActionDTO.playerAction()) {
-            case CHECK -> {
-               // if (raiser.getBalance().getBet().compareTo(speaker.getBalance().getBet()) != 0) {
-               //     throw new IllegalStateException("checker should have same amount as raiser");
-               // }
-                table.setSpeaker(nextSpeaker(table));
-            }
-            case CALL -> {
-              //  if (!(((raiser.getBalance().getBet().max(table.getBigBlind()).compareTo(speaker.getBalance().getBet().add(speakerActionDTO.changeAmount())) == 0 && table.getRound() == 0) ||
-              //          (raiser.getBalance().getBet().compareTo(speaker.getBalance().getBet().add(speakerActionDTO.changeAmount())) == 0 && table.getRound() != 0)
-              //  ) ||
-              //          speakerActionDTO.changeAmount().compareTo(speaker.getBalance().getCash()) == 0)
-              //  ) {
-              //      throw new IllegalStateException("this caller is not a caller");
-              //  }
-                speaker.bet(speakerActionDTO.changeAmount());
-                table.setSpeaker(nextSpeaker(table));
-            }
+            case CALL -> speaker.bet(speakerActionDTO.changeAmount());
             case RAISE -> {
-               // if (!(speakerActionDTO.changeAmount().compareTo(table.getBigBlind().max(raiser.getBalance().getBet().subtract(speaker.getBalance().getBet()))) < 0 ||
-               //         (speakerActionDTO.changeAmount().compareTo(speaker.getBalance().getCash()) == 0 &&
-               //                 raiser.getBalance().getBet().compareTo(speakerActionDTO.changeAmount().add(speaker.getBalance().getBet())) < 1))) {
-               //     throw new IllegalStateException("not valid amount");
-               // }
                 speaker.bet(speakerActionDTO.changeAmount());
                 table.setAfterLast(speaker.getState().getRoundRole());
-                table.setSpeaker(nextSpeaker(table));
             }
-            case FOLD -> {
-                player.fold();
-                table.setSpeaker(nextSpeaker(table));
-            }
+            case FOLD -> player.fold();
         }
-
-
-        //todo update status és balance
-        //todo ki kell számolni a következő roundot és speakert
+        handleNextSpeaker(table);
 
         return table;
     }
 
+    private void handleNextSpeaker(Table table) {
+        Optional<RoundRole> roundRole = nextSpeaker(table);
+        roundRole.ifPresentOrElse(
+                roundRole1 -> table.setSpeaker(roundRole1),
+                () -> {
+                    Optional<Integer> round = getNextRound(table);
+                    round.ifPresentOrElse(
+                            nextRound -> handleNextRound(table, nextRound),
+                            () -> {
+                                handleEndOfRound(table);
+                            }
+                    );
+                }
+        );
+    }
 
-    public RoundRole nextSpeaker(final @NonNull Table table) {
-        for (RoundRole roundRole = table.getSpeaker().nextRole(); roundRole != table.getAfterLast(); roundRole.nextRole()) {
-            if (table.getSeats().stream().anyMatch(player -> player.isSpeakable(roundRole))) {
-                return roundRole;
+
+    public void handleEndOfRound(Table table) {
+        List<Player> ultimatePlayers = table
+                .getSeats()
+                .stream()
+                .filter(Player::isActive)
+                .toList();
+        List<Player> winners = seekingWinner(ultimatePlayers);
+
+
+    }
+
+    private List<Player> seekingWinner(List<Player> ultimatePlayers) {
+        return null;
+    }
+
+    //todo majd imp
+    private void handleNextRound(Table table, Integer nextRound) {
+        table.setRound(nextRound);
+        RoundRole firstSpeaker = getFirstSpeaker(table);
+        table.setSpeaker(firstSpeaker);
+        table.setAfterLast(firstSpeaker);
+    }
+
+    private RoundRole getFirstSpeaker(Table table) {
+        for (RoundRole speaker : RoundRole.values()) {
+            final RoundRole role = speaker;
+            if (table.getSeats().stream().anyMatch(player -> player.isSpeakable(role))) {
+                return speaker;
             }
         }
-        return null;
+        throw new IllegalStateException("Couldn't find first speaker");
+    }
+
+    private Optional<Integer> getNextRound(Table table) {
+        return table.getRound() == 3 ? Optional.empty() : Optional.of(table.getRound() + 1);
+    }
+
+
+    public Optional<RoundRole> nextSpeaker(final @NonNull Table table) {
+        for (RoundRole roundRole = table
+                .getSpeaker()
+                .nextRole(); roundRole != table
+                .getAfterLast(); roundRole = roundRole
+                .nextRole()) {
+            final RoundRole role = roundRole;
+            if (table.getSeats().stream().anyMatch(player -> player.isSpeakable(role))) {
+                return Optional.of(roundRole);
+            }
+        }
+        return Optional.empty();
     }
 }
 // írd át ezt az egy metódust
-///todo TESZTET a round role nextRole() metódusra
+///todo TESZTET a round role nextRole() metódusra SPRING
+//todo validáció kiegészítés (csak akkor lehessen az opciót alkalmazni ha tényleg jogos)

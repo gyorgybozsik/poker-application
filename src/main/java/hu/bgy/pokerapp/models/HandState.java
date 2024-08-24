@@ -29,7 +29,7 @@ public class HandState {
     private @NonNull Map<Rank, Integer> fillRanks(@NonNull final TreeSet<Card> cards) {
         final Map<Rank, Integer> ranks = new HashMap<>();
         cards.stream()
-                .map(Card::rank)
+                .map(Card::getRank)
                 .toList()
                 .forEach(rank -> fillMap(ranks, rank));
         return ranks;
@@ -39,7 +39,7 @@ public class HandState {
     private Map<Symbol, Integer> fillSymbols(@NonNull final TreeSet<Card> cards) {
         final Map<Symbol, Integer> symbols = new HashMap<>();
         cards.stream()
-                .map(Card::symbol)
+                .map(Card::getSymbol)
                 .toList()
                 .forEach(symbol -> fillMap(symbols, symbol));
         return symbols;
@@ -56,13 +56,13 @@ public class HandState {
     private Map<Symbol, TreeSet<Rank>> fillRankBySymbols(@NonNull final TreeSet<Card> cards) {
         final Map<Symbol, TreeSet<Rank>> rankBySymbols = new HashMap<>();
         for (Card card : cards) {
-            if (rankBySymbols.containsKey(card.symbol())) {
-                final TreeSet<Rank> ranks = rankBySymbols.get(card.symbol());
-                ranks.add(card.rank());
+            if (rankBySymbols.containsKey(card.getSymbol())) {
+                final TreeSet<Rank> ranks = rankBySymbols.get(card.getSymbol());
+                ranks.add(card.getRank());
             } else {
                 final TreeSet<Rank> ranks = new TreeSet<>();
-                ranks.add(card.rank());
-                rankBySymbols.put(card.symbol(), ranks);
+                ranks.add(card.getRank());
+                rankBySymbols.put(card.getSymbol(), ranks);
             }
         }
         return rankBySymbols;

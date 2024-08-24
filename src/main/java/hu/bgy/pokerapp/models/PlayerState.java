@@ -4,10 +4,9 @@ import hu.bgy.pokerapp.enums.InGameState;
 import hu.bgy.pokerapp.enums.RoundRole;
 import jakarta.persistence.*;
 import jakarta.persistence.Table;
-import lombok.AccessLevel;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import lombok.NonNull;
+import lombok.*;
+
+import java.util.UUID;
 
 @Data
 @Entity
@@ -16,10 +15,11 @@ import lombok.NonNull;
 public class PlayerState {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE)
+    @GeneratedValue(strategy = GenerationType.UUID)
     //@SequenceGenerator(name = "ps_seq_g", sequenceName = "player_states_id_seq")
-    private Long id;
+    private UUID id;
 
+    @ToString.Exclude
     @OneToOne()
     @JoinColumn(name = "player_id", referencedColumnName = "id", nullable = false)
     private Player player;

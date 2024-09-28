@@ -7,6 +7,8 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.HashSet;
+import java.util.Set;
 import java.util.TreeSet;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -15,7 +17,7 @@ import static org.springframework.util.CollectionUtils.isEmpty;
 
 @Entity
 @Table (name = "hands")
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@NoArgsConstructor(access = AccessLevel.PUBLIC)
 @Data
 public class Hand {
 
@@ -29,7 +31,8 @@ public class Hand {
   //          joinColumns = @JoinColumn(name = "player_id"),
   //          inverseJoinColumns = @JoinColumn(name = "card_id")
   //  )
-    private TreeSet<CardOwner> cardOwners = new TreeSet<>();
+    @Setter
+    private Set<CardOwner> cardOwners = new HashSet<>();
 
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "player_id", referencedColumnName = "id", nullable = false)
@@ -43,7 +46,7 @@ public class Hand {
 
     public Hand(final TreeSet<CardOwner> cardOwners) {
         this.cardOwners = cardOwners;
-        validate();
+       // validate();
     }
 
 

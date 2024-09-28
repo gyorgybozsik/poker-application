@@ -42,7 +42,7 @@ public class Balance {
         }
 
     }
-
+//todo azt gondolom itt a STACKOVERFLOW kiindulópontja
     public boolean hasCash() {
         return cash.compareTo(BigDecimal.ZERO) > 0;
     }

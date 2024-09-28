@@ -6,10 +6,7 @@ import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-import java.util.Random;
-import java.util.Set;
-import java.util.stream.Collectors;
+import java.util.*;
 
 @RequiredArgsConstructor
 @Service
@@ -44,12 +41,17 @@ public class DeckServiceImpl implements DeckService {
 
     public @NonNull Deck remainingDeck(final @NonNull Table table) {
         final List<Card> allCard = cardRepo.findAll();
-        final Set<Card> tableCards = table.getCards();
-        final Set<Card> playerCards = table.getSeats().stream()
-                .map(Player::getHand)
-                .map(Hand::getCards)
-                .flatMap(Set::stream)
-                .collect(Collectors.toSet());
+        final Set<Card> tableCards = table.getCardsForDeck();
+        final Set<Card> playerCards = new HashSet<>();
+        for (Player player : table.getSeats()) {
+           Optional<Hand> hand = Optional.ofNullable(player.getHand());
+            hand.ifPresentOrElse(
+                    (value) -> { playerCards.addAll(value.getCards());
+            },
+                    () -> {
+                    }
+            );
+        }
 
         return new Deck(allCard, tableCards, playerCards);
     }

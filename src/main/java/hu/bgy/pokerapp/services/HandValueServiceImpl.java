@@ -8,6 +8,7 @@ import hu.bgy.pokerapp.models.Hand;
 import hu.bgy.pokerapp.models.HandEvaluation;
 import lombok.NonNull;
 import org.springframework.lang.Nullable;
+import org.springframework.stereotype.Service;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -16,12 +17,13 @@ import java.util.stream.IntStream;
 import static hu.bgy.pokerapp.enums.Rank.ACE;
 import static hu.bgy.pokerapp.enums.Value.values;
 import static java.util.Arrays.stream;
-
+@Service
 public class HandValueServiceImpl implements HandValueService {
     public @NonNull Value evaluate(@Nullable final Hand hand) {
         if (hand == null) {
             throw new IllegalArgumentException();
         }
+        fillHandState(hand);
         return stream(values())
                 .filter(value -> isMatch(value, hand))
                 .findFirst()

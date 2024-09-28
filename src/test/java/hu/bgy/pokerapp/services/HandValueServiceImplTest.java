@@ -11,10 +11,7 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.boot.test.context.SpringBootTest;
 
-import java.util.Collections;
-import java.util.Set;
-import java.util.TreeSet;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Stream;
 
 import static hu.bgy.pokerapp.enums.Rank.*;
@@ -211,13 +208,12 @@ public class HandValueServiceImplTest {
     }
 
     private Hand hand(final TreeSet<Card> cards) {
-        final TreeSet<CardOwner> cardO = new TreeSet<>();
+        final TreeSet<CardOwner> cardO = new TreeSet<>(Comparator.comparing(CardOwner::getCard));
         cards.forEach(card -> {
             CardOwner e = new CardOwner();
             e.setCard(card);
             cardO.add(e);
         });
-
         return new Hand(cardO);
     }
 

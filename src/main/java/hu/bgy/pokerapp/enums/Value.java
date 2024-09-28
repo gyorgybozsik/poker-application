@@ -26,4 +26,5 @@ public enum Value {
     private final boolean isFlush;
     private final boolean isHighest;
 
+
 }

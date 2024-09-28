@@ -4,22 +4,22 @@ import hu.bgy.pokerapp.components.TableValidator;
 import hu.bgy.pokerapp.dtos.SpeakerActionDTO;
 import hu.bgy.pokerapp.enums.PokerType;
 import hu.bgy.pokerapp.enums.RoundRole;
+import hu.bgy.pokerapp.enums.Value;
 import hu.bgy.pokerapp.exceptions.ValidationException;
-import hu.bgy.pokerapp.models.Player;
-import hu.bgy.pokerapp.models.Table;
+import hu.bgy.pokerapp.models.*;
 import hu.bgy.pokerapp.models.poker.Poker;
 import hu.bgy.pokerapp.services.poker.TableService;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 @Service
 public class TableServiceImpl implements TableService {
+    private final HandValueService handValueService;
     private final TableValidator tableValidator;
     final Set<Poker> pokerKinds;
 
@@ -73,13 +73,44 @@ public class TableServiceImpl implements TableService {
                 .stream()
                 .filter(Player::isActive)
                 .toList();
-        List<Player> winners = seekingWinner(ultimatePlayers);
+        List<Player> winners = seekingWinner(table, ultimatePlayers);
+        splittingThePot(table, winners);
 
 
     }
 
-    private List<Player> seekingWinner(List<Player> ultimatePlayers) {
-        return null;
+    private void splittingThePot(Table table, List<Player> winners) {
+
+    }
+
+    public List<Player> seekingWinner(Table table, List<Player> ultimatePlayers) {
+        Map<Player, Value> results = new HashMap<>();
+        for (Player player : ultimatePlayers) {
+            Set<Card> finalFiveCard = handValueService.getValuesHand(setMaker(player.getCompleteCards(player, table)));
+            Value value = handValueService.evaluate(setMaker(new TreeSet<>(finalFiveCard)));
+            results.put(player, value);
+            player.setHand(setMaker(new TreeSet<>(finalFiveCard)));
+        }
+        return theBestValue(results);
+    }
+
+    public List<Player> theBestValue(Map<Player, Value> results) {
+        Value highestValue = results.values().stream().max(Comparator.naturalOrder()).orElse(Value.NOTHING);
+        return results.entrySet().stream()
+                .filter(entry -> entry.getValue() == highestValue)
+                .map(Map.Entry::getKey)
+                .collect(Collectors.toList());
+    }
+
+
+    private Hand setMaker(final TreeSet<Card> cards) {
+        final TreeSet<CardOwner> cardO = new TreeSet<>(Comparator.comparing(CardOwner::getCard));
+        cards.forEach(card -> {
+            CardOwner e = new CardOwner();
+            e.setCard(card);
+            cardO.add(e);
+        });
+        return new Hand(cardO);
     }
 
     //todo majd imp

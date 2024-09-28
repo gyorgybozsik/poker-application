@@ -7,6 +7,7 @@ import jakarta.persistence.Table;
 import lombok.*;
 
 import java.math.BigDecimal;
+import java.util.TreeSet;
 import java.util.UUID;
 
 @Data
@@ -64,5 +65,12 @@ public class Player {
 
     public void bet(@NonNull final BigDecimal betAmount) {
         balance.bet(betAmount);
+    }
+
+    public TreeSet<Card> getCompleteCards(Player player, hu.bgy.pokerapp.models.Table table) {
+        TreeSet<Card> completeSeries = new TreeSet<>();
+        completeSeries.addAll(player.getHand().getCards());
+        completeSeries.addAll(table.getCardsForDeck());
+        return completeSeries;
     }
 }

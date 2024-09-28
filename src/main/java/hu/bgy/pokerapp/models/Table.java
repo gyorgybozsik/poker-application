@@ -13,6 +13,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import static hu.bgy.pokerapp.enums.RoundRole.SMALL_BLIND;
 import static hu.bgy.pokerapp.enums.RoundRole.SPEAKER_1;
@@ -48,6 +49,10 @@ public class Table {
     @Enumerated(EnumType.STRING)
     @Column(name = "after_last", nullable = false)
     private RoundRole afterLast;
+
+    public void setCards(Set<CardOwner> cards) {
+        this.cards = cards;
+    }
 
     @OneToMany
  //   @JoinTable(
@@ -100,13 +105,8 @@ public class Table {
                 .findFirst().orElseThrow(IllegalStateException::new);
     }
 
-    public Set<Card> getCards() {
-        Set<Card> set = new HashSet<>();
-        for (CardOwner card : cards) {
-            Card cardOwnerCard = card.getCard();
-            set.add(cardOwnerCard);
-        }
-        return set;
+    public Set<Card> getCardsForDeck() {
+        return cards.stream().map(CardOwner::getCard).collect(Collectors.toSet());
     }
    // public Set<Card> getCards() {
    //     return cards.stream().map(CardOwner::getCard).collect(Collectors.toSet());

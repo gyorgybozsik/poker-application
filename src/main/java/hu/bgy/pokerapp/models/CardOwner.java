@@ -2,6 +2,7 @@ package hu.bgy.pokerapp.models;
 
 import jakarta.persistence.*;
 import lombok.Data;
+import lombok.ToString;
 
 import java.io.Serializable;
 import java.util.UUID;
@@ -26,13 +27,15 @@ public class CardOwner {
     @JoinColumn(name = "card_id")
     private Card card;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @MapsId("playerId")
+    @ToString.Exclude
     @JoinColumn(name = "player_id")
     private Player player;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @MapsId("tableId")
+    @ToString.Exclude
     @JoinColumn(name = "table_id")
     private hu.bgy.pokerapp.models.Table table;
 }

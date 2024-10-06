@@ -3,6 +3,7 @@ package hu.bgy.pokerapp.services;
 import hu.bgy.pokerapp.components.TableValidator;
 import hu.bgy.pokerapp.dtos.SpeakerActionDTO;
 import hu.bgy.pokerapp.enums.PokerType;
+import hu.bgy.pokerapp.enums.Rank;
 import hu.bgy.pokerapp.enums.RoundRole;
 import hu.bgy.pokerapp.enums.Value;
 import hu.bgy.pokerapp.exceptions.ValidationException;
@@ -13,14 +14,16 @@ import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.*;
-import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 @Service
 public class TableServiceImpl implements TableService {
     private final HandValueService handValueService;
     private final TableValidator tableValidator;
+
     final Set<Poker> pokerKinds;
 
     private Poker getPokerKind(final @NonNull PokerType pokerType) {
@@ -45,65 +48,138 @@ public class TableServiceImpl implements TableService {
             }
             case FOLD -> player.fold();
         }
-        handleNextSpeaker(table);
-
-        return table;
+        return handleNextSpeaker(table);
     }
 
-    private void handleNextSpeaker(Table table) {
+    private Table handleNextSpeaker(Table table) {
         Optional<RoundRole> roundRole = nextSpeaker(table);
-        roundRole.ifPresentOrElse(
-                roundRole1 -> table.setSpeaker(roundRole1),
-                () -> {
-                    Optional<Integer> round = getNextRound(table);
-                    round.ifPresentOrElse(
-                            nextRound -> handleNextRound(table, nextRound),
-                            () -> {
-                                handleEndOfRound(table);
-                            }
-                    );
+        if (roundRole.isPresent()) {
+            table.setSpeaker(roundRole.get());
+        } else {
+            if (isEndOfTheGame(table)) {
+                return handleEndOfRound(table);
+            }
+        }return table;
+    }
+
+
+    public Table handleEndOfRound(Table table) {
+        Map<Value, List<Player>> playersValues = seekingWinner(table);
+        for (Map.Entry<Value, List<Player>> entry : playersValues.entrySet()) {
+            BigDecimal maximumBet = entry.getValue().stream()
+                    .map(Player::getBalance)
+                    .map(Balance::getBet)
+                    .max(Comparator.naturalOrder())
+                    .orElseThrow(IllegalStateException::new);
+            while (BigDecimal.ZERO.compareTo(maximumBet) == 0) {
+                BigDecimal minimumBet = entry.getValue().stream()
+                        .map(Player::getBalance)
+                        .map(Balance::getBet)
+                        .filter(bigDecimal -> BigDecimal.ZERO.compareTo(bigDecimal) != 0)
+                        .min(Comparator.naturalOrder())
+                        .orElseThrow(IllegalStateException::new);
+                BigDecimal distribute = BigDecimal.ZERO;
+                List<Player> seats = table.getSeats();
+                for (Player player : seats) {
+                    distribute = distribute.add(player.getBalance().deductBet(minimumBet));
                 }
-        );
+                final BigDecimal distributeCash = distribute.divide(BigDecimal.valueOf(entry.getValue().size()), 2, RoundingMode.HALF_DOWN);
+                entry.getValue().forEach(player -> player.getBalance().addCash(distributeCash));
+                entry.getValue().removeIf(Player::hasNoBet);
+                maximumBet = maximumBet.subtract(minimumBet);
+
+                //todo teszteket készíteni
+            }
+        }return table;
     }
 
-
-    public void handleEndOfRound(Table table) {
-        List<Player> ultimatePlayers = table
-                .getSeats()
-                .stream()
-                .filter(Player::isActive)
-                .toList();
-        List<Player> winners = seekingWinner(table, ultimatePlayers);
-        splittingThePot(table, winners);
-
-
-    }
-
+    //todo azonos kezeknél
     private void splittingThePot(Table table, List<Player> winners) {
-
+        Set<Integer> cd = new HashSet<>();
+        cd.contains(1);
     }
 
-    public List<Player> seekingWinner(Table table, List<Player> ultimatePlayers) {
-        Map<Player, Value> results = new HashMap<>();
+
+    public Map<Value, List<Player>> seekingWinner(Table table) {
+        Map<Value, List<Player>> results = new TreeMap<>();
+        List<Player> ultimatePlayers = table.getActivePlayers();
         for (Player player : ultimatePlayers) {
-            Set<Card> finalFiveCard = handValueService.getValuesHand(setMaker(player.getCompleteCards(player, table)));
-            Value value = handValueService.evaluate(setMaker(new TreeSet<>(finalFiveCard)));
-            results.put(player, value);
-            player.setHand(setMaker(new TreeSet<>(finalFiveCard)));
+            Value value = makeFinalHandAndValue(player, table);
+            if (results.containsKey(value)) {
+                results.get(value).add(player);
+            } else {
+                List<Player> next = new ArrayList<>();
+                next.add(player);
+                results.put(value, next);
+            }
         }
-        return theBestValue(results);
+        return results;//todo magaslap elkezelés
     }
 
-    public List<Player> theBestValue(Map<Player, Value> results) {
-        Value highestValue = results.values().stream().max(Comparator.naturalOrder()).orElse(Value.NOTHING);
-        return results.entrySet().stream()
-                .filter(entry -> entry.getValue() == highestValue)
-                .map(Map.Entry::getKey)
-                .collect(Collectors.toList());
+    private Value makeFinalHandAndValue(Player player, Table table) {
+        player.getHand().addCard(table.getCards());
+        Value value = handValueService.evaluate(player.getHand());
+        Set<Card> finalHand = handValueService.getValuesHand(player.getHand());
+        player.getHand().throwCard(finalHand);
+        return value;
+    }
+
+    public List<Player> theBestValue(Table table, List<Player> players, Value value) {
+        List<Player> winner = new ArrayList<>();
+        switch (value) {
+            case ROYAL_FLUSH -> {
+                return players;
+            }
+            case STRAIGHT_FLUSH, FLUSH, STRAIGHT, NOTHING -> winner = highCard(players, table);
+            case POKER, FULL_HOUSE, DRILL, TWO_PAIRS, PAIR -> winner = highCombination(players, table);
+        }
+        return winner;
+    }
+
+    private List<Player> highCombination(List<Player> players, Table table) {
+        List<Player> winners = new ArrayList<>();
+        Map<Player, Map<Rank, Integer>> details = new HashMap<>();
+        for (Player player : players) {
+            Map<Rank, Integer> cards = fillRanks(player.getHand().getCards());
+            details.put(player, cards);
+        }
+        return winners;
+    }
+
+    public @NonNull Map<Rank, Integer> fillRanks(@NonNull final TreeSet<Card> cards) {
+        final Map<Rank, Integer> ranks = new HashMap<>();
+        cards.stream()
+                .map(Card::getRank)
+                .toList()
+                .forEach(rank -> fillMap(ranks, rank));
+        return ranks;
+    }
+
+    private <T extends Enum<T>> void fillMap(@NonNull final Map<T, Integer> map, @NonNull final T type) {
+        if (map.containsKey(type)) {
+            map.put(type, map.get(type) + 1);
+        } else {
+            map.put(type, 1);
+        }
+    }
+
+    private List<Player> highCard(List<Player> players, Table table) {
+        List<Player> winner = new ArrayList<>();
+        for (Player player : players) {
+            if (winner.isEmpty()) {
+                winner.add(player);
+                continue;
+            }
+            if (player.getHand().getCards().getFirst().getRank().isHigher(winner.getFirst().getHand().getCards().getFirst().getRank())) {
+                winner.clear();
+                winner.add(player);
+            }
+        }
+        return winner;
     }
 
 
-    private Hand setMaker(final TreeSet<Card> cards) {
+    private Hand setMaker(Player player, final TreeSet<Card> cards) {
         final TreeSet<CardOwner> cardO = new TreeSet<>(Comparator.comparing(CardOwner::getCard));
         cards.forEach(card -> {
             CardOwner e = new CardOwner();
@@ -114,11 +190,15 @@ public class TableServiceImpl implements TableService {
     }
 
     //todo majd imp
-    private void handleNextRound(Table table, Integer nextRound) {
-        table.setRound(nextRound);
+    private boolean isEndOfTheGame(Table table) {
+        if (table.getRound() == 3) {
+            return true;
+        }
+        table.setRound(table.getRound() + 1);
         RoundRole firstSpeaker = getFirstSpeaker(table);
         table.setSpeaker(firstSpeaker);
         table.setAfterLast(firstSpeaker);
+        return false;
     }
 
     private RoundRole getFirstSpeaker(Table table) {
@@ -143,7 +223,9 @@ public class TableServiceImpl implements TableService {
                 .getAfterLast(); roundRole = roundRole
                 .nextRole()) {
             final RoundRole role = roundRole;
-            if (table.getSeats().stream().anyMatch(player -> player.isSpeakable(role))) {
+            if (table.getSeats()
+                    .stream()
+                    .anyMatch(player -> player.isSpeakable(role))) {
                 return Optional.of(roundRole);
             }
         }
@@ -153,3 +235,7 @@ public class TableServiceImpl implements TableService {
 // írd át ezt az egy metódust
 ///todo TESZTET a round role nextRole() metódusra SPRING
 //todo validáció kiegészítés (csak akkor lehessen az opciót alkalmazni ha tényleg jogos)
+
+
+//todo HandValueServicbe átservezni a magyaslap elkezelést
+//todo split pot ide tableservic-be

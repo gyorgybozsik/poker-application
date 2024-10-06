@@ -40,13 +40,23 @@ public class Balance {
             bet = bet.add(currentBetAmount);
             cash = cash.subtract(currentBetAmount);
         }
-
     }
-//todo azt gondolom itt a STACKOVERFLOW kiindulópontja
+
+    public void addCash(BigDecimal cash) {
+        this.cash = this.cash.add(cash);
+    }
+
     public boolean hasCash() {
         return cash.compareTo(BigDecimal.ZERO) > 0;
     }
+
+    public BigDecimal deductBet(BigDecimal minimumBet) {
+        if (bet.compareTo(minimumBet) == -1) {
+            BigDecimal tmp = bet;
+            bet = BigDecimal.ZERO;
+            return tmp;
+        }
+        bet = bet.subtract(minimumBet);
+        return minimumBet;
+    }
 }
-
-
-//todo táblák létrehozása és összekapcsolása a hogyhívják kóddal :P

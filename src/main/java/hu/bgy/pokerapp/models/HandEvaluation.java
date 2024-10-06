@@ -11,6 +11,7 @@ import static java.util.Arrays.stream;
 public class HandEvaluation {
     private final TreeSet<Card> cards;
 
+
     private final HandState handState;
 
     public HandEvaluation(final @NonNull TreeSet<Card> @NonNull ... setsOfCards) {

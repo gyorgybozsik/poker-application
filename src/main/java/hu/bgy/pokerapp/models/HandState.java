@@ -26,7 +26,7 @@ public class HandState {
         this.rankOccurrences = fillRankOccurrences(ranks);
     }
 
-    private @NonNull Map<Rank, Integer> fillRanks(@NonNull final TreeSet<Card> cards) {
+    public @NonNull Map<Rank, Integer> fillRanks(@NonNull final TreeSet<Card> cards) {
         final Map<Rank, Integer> ranks = new HashMap<>();
         cards.stream()
                 .map(Card::getRank)

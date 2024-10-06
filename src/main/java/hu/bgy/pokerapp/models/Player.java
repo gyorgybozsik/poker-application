@@ -2,15 +2,16 @@ package hu.bgy.pokerapp.models;
 
 import hu.bgy.pokerapp.enums.InGameState;
 import hu.bgy.pokerapp.enums.RoundRole;
-import jakarta.persistence.*;
 import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.*;
 
 import java.math.BigDecimal;
-import java.util.TreeSet;
 import java.util.UUID;
 
-@Data
+@Getter
+@Setter
+@ToString
 @Entity
 @Table(name = "players")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -27,7 +28,6 @@ public class Player {
     @JoinColumn(name = "balance_id", referencedColumnName = "id", nullable = false)
     private Balance balance;
 
-    @ToString.Exclude
     @OneToOne(mappedBy = "player")
     private Hand hand;
 
@@ -49,7 +49,6 @@ public class Player {
         state = new PlayerState(this, roundRole);
     }
 
-
     public boolean isSpeakable(@NonNull final RoundRole role) {
         return state.isActiveRoundRole(role) && balance.hasCash();
     }
@@ -67,10 +66,17 @@ public class Player {
         balance.bet(betAmount);
     }
 
-    public TreeSet<Card> getCompleteCards(Player player, hu.bgy.pokerapp.models.Table table) {
-        TreeSet<Card> completeSeries = new TreeSet<>();
-        completeSeries.addAll(player.getHand().getCards());
-        completeSeries.addAll(table.getCardsForDeck());
-        return completeSeries;
+    @Override
+    public int hashCode() {
+        return super.hashCode();
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        return super.equals(obj);
+    }
+
+    public boolean hasNoBet() {
+        return BigDecimal.ZERO.compareTo(this.getBalance().getBet()) == 0;
     }
 }

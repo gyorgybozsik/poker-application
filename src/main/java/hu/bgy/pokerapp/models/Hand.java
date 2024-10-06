@@ -1,16 +1,14 @@
 package hu.bgy.pokerapp.models;
 
+import hu.bgy.pokerapp.enums.Value;
 import jakarta.persistence.Table;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.ToString;
 
-import java.util.HashSet;
-import java.util.Set;
-import java.util.TreeSet;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static org.springframework.util.CollectionUtils.isEmpty;
@@ -26,22 +24,15 @@ public class Hand {
     private UUID id;
 
     @OneToMany
-  //  @JoinTable(
-  //          name = "card_owners",
-  //          joinColumns = @JoinColumn(name = "player_id"),
-  //          inverseJoinColumns = @JoinColumn(name = "card_id")
-  //  )
-    @Setter
     private Set<CardOwner> cardOwners = new HashSet<>();
 
     @OneToOne(cascade = CascadeType.ALL)
+    @ToString.Exclude
     @JoinColumn(name = "player_id", referencedColumnName = "id", nullable = false)
     private Player player;
-
-
-
     @Transient
-    @Setter
+    private Value handScore;
+    @Transient
     private HandEvaluation latestHandEvaluation;
 
     public Hand(final TreeSet<CardOwner> cardOwners) {
@@ -49,6 +40,12 @@ public class Hand {
        // validate();
     }
 
+    public void addCard(Set<CardOwner> cardOwner) {
+        cardOwners.addAll(cardOwner);
+    }
+    public void throwCard(Set<Card> cards) {
+        cardOwners.removeIf(cardOwner -> !cards.contains(cardOwner.getCard()));
+    }
 
     public void validate() {
         if (isEmpty(cardOwners) || cardOwners.size() < 5) {

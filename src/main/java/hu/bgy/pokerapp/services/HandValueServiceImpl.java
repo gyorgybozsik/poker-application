@@ -24,10 +24,13 @@ public class HandValueServiceImpl implements HandValueService {
             throw new IllegalArgumentException();
         }
         fillHandState(hand);
-        return stream(values())
-                .filter(value -> isMatch(value, hand))
+        Value value = stream(values())
+                .filter(v -> isMatch(v, hand))
                 .findFirst()
                 .orElseThrow(IllegalArgumentException::new);
+        hand.setHandScore(value);
+
+        return value;
     }
 
     @Override

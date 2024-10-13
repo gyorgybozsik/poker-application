@@ -9,6 +9,8 @@ import lombok.RequiredArgsConstructor;
 import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -16,9 +18,12 @@ import org.springframework.boot.test.context.SpringBootTest;
 import java.math.BigDecimal;
 import java.util.*;
 import java.util.stream.IntStream;
+import java.util.stream.Stream;
 
 import static hu.bgy.pokerapp.enums.PlayerAction.FOLD;
 import static hu.bgy.pokerapp.enums.PokerType.TEXAS_HOLDEM;
+import static hu.bgy.pokerapp.enums.Rank.*;
+import static hu.bgy.pokerapp.enums.Symbol.*;
 import static java.math.BigDecimal.ZERO;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -66,62 +71,62 @@ public class TableServiceImplTest {
     private List<TreeSet<Card>> fillCombinations() {
         List<TreeSet<Card>> combinations = new ArrayList<>();
         TreeSet<Card> cards = new TreeSet<>();
-        cards.add(card(Symbol.HEARTH, Rank.ACE));
-        cards.add(card(Symbol.CLUB, Rank.SIX));
-        cards.add(card(Symbol.CLUB, Rank.EIGHT));
-        cards.add(card(Symbol.SPADE, Rank.TEN));
-        cards.add(card(Symbol.CLUB, Rank.TEN));
+        cards.add(card(HEARTH, ACE));
+        cards.add(card(CLUB, SIX));
+        cards.add(card(CLUB, EIGHT));
+        cards.add(card(SPADE, TEN));
+        cards.add(card(CLUB, TEN));
         combinations.add(new TreeSet<>(cards));
         cards.clear();
 
         //todo 2pár ász-10
-        cards.add(card(Symbol.DIAMOND, Rank.ACE));
-        cards.add(card(Symbol.DIAMOND, Rank.SIX));
+        cards.add(card(DIAMOND, ACE));
+        cards.add(card(DIAMOND, SIX));
         combinations.add(new TreeSet<>(cards));
         cards.clear();
         //todo 2pár ász-10       split
-        cards.add(card(Symbol.SPADE, Rank.ACE));
-        cards.add(card(Symbol.DIAMOND, Rank.EIGHT));
+        cards.add(card(SPADE, ACE));
+        cards.add(card(DIAMOND, EIGHT));
         combinations.add(new TreeSet<>(cards));
         cards.clear();
         //todo drill Ász-8 magaslappal
-        cards.add(card(Symbol.HEARTH, Rank.TEN));
-        cards.add(card(Symbol.DIAMOND, Rank.TWO));
+        cards.add(card(HEARTH, TEN));
+        cards.add(card(DIAMOND, TWO));
         combinations.add(new TreeSet<>(cards));
         cards.clear();
         //todo drill Ász-Király magaslappal
-        cards.add(card(Symbol.DIAMOND, Rank.TEN));
-        cards.add(card(Symbol.CLUB, Rank.KING));
+        cards.add(card(DIAMOND, TEN));
+        cards.add(card(CLUB, KING));
         combinations.add(new TreeSet<>(cards));
         cards.clear();
         //todo sor
-        cards.add(card(Symbol.DIAMOND, Rank.SEVEN));
-        cards.add(card(Symbol.HEARTH, Rank.NINE));
+        cards.add(card(DIAMOND, SEVEN));
+        cards.add(card(HEARTH, NINE));
         combinations.add(new TreeSet<>(cards));
         cards.clear();
         //todo szín
-        cards.add(card(Symbol.CLUB, Rank.FIVE));
-        cards.add(card(Symbol.CLUB, Rank.FOUR));
+        cards.add(card(CLUB, FIVE));
+        cards.add(card(CLUB, FOUR));
         combinations.add(new TreeSet<>(cards));
         cards.clear();
         //todo szín ász magaslappal
-        cards.add(card(Symbol.CLUB, Rank.TWO));
-        cards.add(card(Symbol.CLUB, Rank.ACE));
+        cards.add(card(CLUB, TWO));
+        cards.add(card(CLUB, ACE));
         combinations.add(new TreeSet<>(cards));
         cards.clear();
         //todo 6-os full
-        cards.add(card(Symbol.SPADE, Rank.SIX));
-        cards.add(card(Symbol.HEARTH, Rank.SIX));
+        cards.add(card(SPADE, SIX));
+        cards.add(card(HEARTH, SIX));
         combinations.add(new TreeSet<>(cards));
         cards.clear();
         //todo 8-os full
-        cards.add(card(Symbol.SPADE, Rank.EIGHT));
-        cards.add(card(Symbol.HEARTH, Rank.EIGHT));
+        cards.add(card(SPADE, EIGHT));
+        cards.add(card(HEARTH, EIGHT));
         combinations.add(new TreeSet<>(cards));
         cards.clear();
         //todo színsor
-        cards.add(card(Symbol.CLUB, Rank.SEVEN));
-        cards.add(card(Symbol.CLUB, Rank.NINE));
+        cards.add(card(CLUB, SEVEN));
+        cards.add(card(CLUB, NINE));
         combinations.add(new TreeSet<>(cards));
         cards.clear();
         return combinations;
@@ -174,16 +179,16 @@ public class TableServiceImplTest {
         cards = getStraight();
         table.setCards(setMaker(null, table, cards));
         cards.clear();
-        cards.add(card(Symbol.CLUB, Rank.TEN));
-        cards.add(card(Symbol.SPADE, Rank.JACK));
+        cards.add(card(CLUB, TEN));
+        cards.add(card(SPADE, JACK));
         table.getSeats().get(0).setHand(new Hand(setMaker(table.getSeats().get(0), table, cards)));
         cards.clear();
-        cards.add(card(Symbol.DIAMOND, Rank.TEN));
-        cards.add(card(Symbol.CLUB, Rank.JACK));
+        cards.add(card(DIAMOND, TEN));
+        cards.add(card(CLUB, JACK));
         table.getSeats().get(1).setHand(new Hand(setMaker(table.getSeats().get(1), table, cards)));
         cards.clear();
-        cards.add(card(Symbol.DIAMOND, Rank.SIX));
-        cards.add(card(Symbol.CLUB, Rank.TEN));
+        cards.add(card(DIAMOND, SIX));
+        cards.add(card(CLUB, TEN));
         table.getSeats().get(2).setHand(new Hand(setMaker(table.getSeats().get(2), table, cards)));
         cards.clear();
         for (int i = 3; i < table.getSeats().size(); i++) {
@@ -196,15 +201,15 @@ public class TableServiceImplTest {
 
     private TreeSet<Card> getStraight() {
         TreeSet<Card> cards = new TreeSet<>();
-        cards.add(card(Symbol.HEARTH, Rank.SEVEN));
-        cards.add(card(Symbol.CLUB, Rank.EIGHT));
-        cards.add(card(Symbol.SPADE, Rank.NINE));
-        cards.add(card(Symbol.DIAMOND, Rank.TWO));
-        cards.add(card(Symbol.HEARTH, Rank.ACE));
+        cards.add(card(HEARTH, SEVEN));
+        cards.add(card(CLUB, EIGHT));
+        cards.add(card(SPADE, NINE));
+        cards.add(card(DIAMOND, TWO));
+        cards.add(card(HEARTH, ACE));
         return cards;
     }
 
-    private TreeSet<CardOwner> setMaker(final Player player, Table table, final TreeSet<Card> cards) {
+    private static TreeSet<CardOwner> setMaker(final Player player, Table table, final TreeSet<Card> cards) {
         TreeSet<CardOwner> cardO = new TreeSet<>(Comparator.comparing(CardOwner::getCard));
         cards.forEach(card -> {
             CardOwner e = new CardOwner();
@@ -296,17 +301,17 @@ public class TableServiceImplTest {
     //@Test
     @ParameterizedTest
     @ValueSource(ints = {2, 3, 4, 5, 6, 7, 8, 9, 10})
-    void handleEndOfRound( int playersNumber ) throws ValidationException {
-            List<BigDecimal> testVariables = loadVariables(playersNumber);
-            final Table table = getTable(3);
-            final List<Player> seats = fillPlayersList2(table, playersNumber);
-            table.setSeats(seats);
-            table.setSpeaker(RoundRole.SMALL_BLIND);
-            table.setAfterLast(RoundRole.SMALL_BLIND);
+    void handleEndOfRound(int playersNumber) throws ValidationException {
+        List<BigDecimal> testVariables = loadVariables(playersNumber);
+        final Table table = getTable(3);
+        final List<Player> seats = fillPlayersList2(table, playersNumber);
+        table.setSeats(seats);
+        table.setSpeaker(RoundRole.SMALL_BLIND);
+        table.setAfterLast(RoundRole.SMALL_BLIND);
 
-            handCombinationsForPlayers(table, playersNumber);
+        handCombinationsForPlayers(table, playersNumber);
 
-            Table resultTable = tableServiceImpl.handleEndOfRound(table);
+        Table resultTable = tableServiceImpl.handleEndOfRound(table);
         IntStream.range(0, playersNumber).forEach(x -> {
             BigDecimal expectedBalance = new BigDecimal(String.valueOf(testVariables.get(x))).setScale(2);
             BigDecimal actualBalance = resultTable.getSeats().get(x).getBalance().getCash().setScale(2);
@@ -314,12 +319,71 @@ public class TableServiceImplTest {
         });
     }
 
+    private static Player creatPlayer(Set<Card> cards, Integer cash, Integer bet, RoundRole roundRole) {
+        Player player = new Player();
+        player.setBalance(Balance.builder().player(player).cash(BigDecimal.valueOf(cash)).bet(BigDecimal.valueOf(bet)).build());
+        Hand hand = new Hand();
+        player.setState(new PlayerState(player, roundRole));
+        player.setHand(hand);
+        hand.setCardOwners(setMaker(player, null, new TreeSet<>(cards)));
+        return player;
+    }
+
+    private static Stream<Arguments> handleEndOfRoundCases() {
+        return Stream.of(
+                Arguments.of(
+                        List.of(
+                                creatPlayer(Set.of(card(DIAMOND, ACE), card(DIAMOND, SIX)), 100, 20, RoundRole.BIG_BLIND),
+                                creatPlayer(Set.of(card(SPADE, ACE), card(DIAMOND, EIGHT)), 100, 20, RoundRole.SMALL_BLIND),
+                                creatPlayer(Set.of(card(HEARTH, TEN), card(DIAMOND, TWO)), 100, 20, RoundRole.SPEAKER_1)),
+
+                        Set.of(card(HEARTH, ACE), card(CLUB, SIX), card(CLUB, EIGHT), card(SPADE, TEN), card(CLUB, TEN)),
+                        List.of(
+                                Balance.builder().cash(new BigDecimal("100.00")).bet(new BigDecimal("0")).build(),
+                                Balance.builder().cash(new BigDecimal("100.00")).bet(new BigDecimal("0")).build(),
+                                Balance.builder().cash(new BigDecimal("160.00")).bet(new BigDecimal("0")).build())
+                ),
+                Arguments.of(
+                        List.of(
+                                creatPlayer(Set.of(card(DIAMOND, ACE), card(DIAMOND, SIX)), 100, 20, RoundRole.BIG_BLIND),
+                                creatPlayer(Set.of(card(SPADE, ACE), card(DIAMOND, EIGHT)), 100, 20, RoundRole.SMALL_BLIND)),
+
+                        Set.of(card(HEARTH, ACE), card(CLUB, SIX), card(CLUB, EIGHT), card(SPADE, TEN), card(CLUB, TEN)),
+                        List.of(
+                                Balance.builder().cash(new BigDecimal("120.00")).bet(new BigDecimal("0")).build(),
+                                Balance.builder().cash(new BigDecimal("120.00")).bet(new BigDecimal("0")).build())
+                )
+        );
+    }
+    //todo egyik játékosnak nyernie kellene, de mégis osztozik
+
+    @ParameterizedTest
+    @MethodSource(value = "handleEndOfRoundCases")
+    void handleEndOfRound2(List<Player> seats, Set<Card> tableCards, List<Balance> expectedBalance) {
+        final Table table = new Table(TEXAS_HOLDEM, BigDecimal.TWO);
+        final UUID id = UUID.fromString("4a98bab1-30a8-44d2-9273-e863e9d5e48b");
+        table.setId(id);
+        table.setRound(3);
+        table.setCards(setMaker(null, table, new TreeSet<>(tableCards)));
+        table.setSeats(seats);
+        table.setSpeaker(RoundRole.SMALL_BLIND);
+        table.setAfterLast(RoundRole.SMALL_BLIND);
+
+
+        Table resultTable = tableServiceImpl.handleEndOfRound(table);
+        assertEquals(expectedBalance.size(), seats.size());
+        for (int i = 0; i != expectedBalance.size(); i++) {
+            assertEquals(expectedBalance.get(i).getCash(), resultTable.getSeats().get(i).getBalance().getCash());
+            assertEquals(expectedBalance.get(i).getBet(), resultTable.getSeats().get(i).getBalance().getBet());
+        }
+    }
+
     private List<BigDecimal> loadVariables(int serialNumber) {
         List<BigDecimal> testVariables = new ArrayList<>();
         for (int i = 0; i < serialNumber; i++) {
             int result = 100;
             if (serialNumber == 2) result += 20;
-            if (i == serialNumber-1 && serialNumber != 2) result = result + (20 * serialNumber);
+            if (i == serialNumber - 1 && serialNumber != 2) result = result + (20 * serialNumber);
             BigDecimal bigDecimalValue = new BigDecimal(result).setScale(2);
             testVariables.add(bigDecimalValue);
         }

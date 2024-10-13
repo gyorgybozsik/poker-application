@@ -3,10 +3,7 @@ package hu.bgy.pokerapp.models;
 import hu.bgy.pokerapp.enums.PokerType;
 import hu.bgy.pokerapp.enums.RoundRole;
 import jakarta.persistence.*;
-import lombok.AccessLevel;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import lombok.NonNull;
+import lombok.*;
 
 import java.math.BigDecimal;
 import java.util.HashSet;

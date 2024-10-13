@@ -9,6 +9,8 @@ import java.util.UUID;
 
 @Data
 @Entity
+@Builder
+@AllArgsConstructor
 @Table(name = "balances")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Balance {

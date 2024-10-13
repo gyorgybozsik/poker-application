@@ -1,7 +1,7 @@
 package hu.bgy.pokerapp.enums;
 
 public enum RoundRole {
-    DEALER,
+   // DEALER,
     SMALL_BLIND,
     BIG_BLIND,
     SPEAKER_1,
@@ -11,6 +11,7 @@ public enum RoundRole {
     SPEAKER_5,
     SPEAKER_6,
     SPEAKER_7,
+    SPEAKER_8,
     ;
 
     public RoundRole nextRole() {

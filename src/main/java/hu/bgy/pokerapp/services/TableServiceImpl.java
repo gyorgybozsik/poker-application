@@ -64,15 +64,15 @@ public class TableServiceImpl implements TableService {
 
 
     public Table handleEndOfRound(Table table) {
-        Map<Value, List<Player>> playersValues = seekingWinner(table);
-        for (Map.Entry<Value, List<Player>> entry : playersValues.entrySet()) {
-            BigDecimal maximumBet = entry.getValue().stream()
+        List<List<Player>>  playersValues = seekingWinner(table);
+        for (List<Player>  entry : playersValues) {
+            BigDecimal maximumBet = entry.stream()
                     .map(Player::getBalance)
                     .map(Balance::getBet)
                     .max(Comparator.naturalOrder())
                     .orElseThrow(IllegalStateException::new);
             while (BigDecimal.ZERO.compareTo(maximumBet) == 0) {
-                BigDecimal minimumBet = entry.getValue().stream()
+                BigDecimal minimumBet = entry.stream()
                         .map(Player::getBalance)
                         .map(Balance::getBet)
                         .filter(bigDecimal -> BigDecimal.ZERO.compareTo(bigDecimal) != 0)
@@ -83,9 +83,9 @@ public class TableServiceImpl implements TableService {
                 for (Player player : seats) {
                     distribute = distribute.add(player.getBalance().deductBet(minimumBet));
                 }
-                final BigDecimal distributeCash = distribute.divide(BigDecimal.valueOf(entry.getValue().size()), 2, RoundingMode.HALF_DOWN);
-                entry.getValue().forEach(player -> player.getBalance().addCash(distributeCash));
-                entry.getValue().removeIf(Player::hasNoBet);
+                final BigDecimal distributeCash = distribute.divide(BigDecimal.valueOf(entry.size()), 2, RoundingMode.HALF_DOWN);
+                entry.forEach(player -> player.getBalance().addCash(distributeCash));
+                entry.removeIf(Player::hasNoBet);
                 maximumBet = maximumBet.subtract(minimumBet);
 
                 //todo teszteket készíteni
@@ -100,7 +100,7 @@ public class TableServiceImpl implements TableService {
     }
 
 
-    public Map<Value, List<Player>> seekingWinner(Table table) {
+    public List<List<Player>>  seekingWinner(Table table) {
         Map<Value, List<Player>> results = new TreeMap<>();
         List<Player> ultimatePlayers = table.getActivePlayers();
         for (Player player : ultimatePlayers) {
@@ -113,7 +113,11 @@ public class TableServiceImpl implements TableService {
                 results.put(value, next);
             }
         }
-        return results;//todo magaslap elkezelés
+        List<List<Player>> order = new ArrayList<>();
+        for (Map.Entry<Value, List<Player>> entry : results.entrySet()) {
+            order.addAll(handValueService.orderWithHighestCard(entry.getKey(), entry.getValue()));
+        }
+        return order;//todo magaslap elkezelés
     }
 
     private Value makeFinalHandAndValue(Player player, Table table) {
@@ -130,7 +134,6 @@ public class TableServiceImpl implements TableService {
             case ROYAL_FLUSH -> {
                 return players;
             }
-            case STRAIGHT_FLUSH, FLUSH, STRAIGHT, NOTHING -> winner = highCard(players, table);
             case POKER, FULL_HOUSE, DRILL, TWO_PAIRS, PAIR -> winner = highCombination(players, table);
         }
         return winner;

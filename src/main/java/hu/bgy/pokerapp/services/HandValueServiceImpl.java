@@ -6,6 +6,7 @@ import hu.bgy.pokerapp.enums.Value;
 import hu.bgy.pokerapp.models.Card;
 import hu.bgy.pokerapp.models.Hand;
 import hu.bgy.pokerapp.models.HandEvaluation;
+import hu.bgy.pokerapp.models.Player;
 import lombok.NonNull;
 import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Service;
@@ -40,6 +41,13 @@ public class HandValueServiceImpl implements HandValueService {
         return hands.stream()
                 .findFirst()
                 .orElseThrow(IllegalArgumentException::new);
+    }
+
+    @Override
+    public List<List<Player>> orderWithHighestCard(Value key, List<Player> value) {
+
+        //todo magaslap elkezelés
+        return List.of(value);
     }
 
     @Override

@@ -3,10 +3,7 @@ package hu.bgy.pokerapp.services;
 import hu.bgy.pokerapp.enums.Rank;
 import hu.bgy.pokerapp.enums.Symbol;
 import hu.bgy.pokerapp.enums.Value;
-import hu.bgy.pokerapp.models.Card;
-import hu.bgy.pokerapp.models.Hand;
-import hu.bgy.pokerapp.models.HandEvaluation;
-import hu.bgy.pokerapp.models.Player;
+import hu.bgy.pokerapp.models.*;
 import lombok.NonNull;
 import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Service;
@@ -42,7 +39,53 @@ public class HandValueServiceImpl implements HandValueService {
                 .findFirst()
                 .orElseThrow(IllegalArgumentException::new);
     }
+    private Player highCombination(List<Player> players, Table table) {
+        Player winner = null;
+        Value handValue = players.getFirst().getHand().getHandScore();
+        Integer key = null;
+        switch (handValue) {
+            case POKER -> key = 4;
+            case FULL_HOUSE, DRILL -> key = 3;
+            case PAIR, TWO_PAIRS -> key = 2;
+        }
 
+        Map<Player, TreeMap<Rank, Integer>> details = new HashMap<>();
+        players.forEach(player -> {
+            TreeMap<Rank, Integer> cards = fillRanks(player.getHand().getCards());
+            details.put(player, cards);
+        });
+//todo itt hagytam félbe
+        for (Map.Entry<Player, TreeMap<Rank, Integer>> entry : details.entrySet()) {
+            Rank bestRank = null;
+            for (Map.Entry<Rank, Integer> rankEntry : entry.getValue().entrySet()) {
+                if (rankEntry.getValue() == key && (bestRank == null || rankEntry.getKey().isHigher(bestRank))) {
+                    bestRank = rankEntry.getKey();
+                }
+                bestRank = rankEntry.getKey();
+                winner = entry.getKey();
+            }
+
+        }
+        return winner;
+    }
+
+
+    public @NonNull TreeMap<Rank, Integer> fillRanks(@NonNull final TreeSet<Card> cards) {
+        final TreeMap<Rank, Integer> ranks = new TreeMap<>();
+        cards.stream()
+                .map(Card::getRank)
+                .toList()
+                .forEach(rank -> fillMap(ranks, rank));
+        return ranks;
+    }
+
+    private <T extends Enum<T>> void fillMap(@NonNull final Map<T, Integer> map, @NonNull final T type) {
+        if (map.containsKey(type)) {
+            map.put(type, map.get(type) + 1);
+        } else {
+            map.put(type, 1);
+        }
+    }
     @Override
     public List<List<Player>> orderWithHighestCard(Value key, List<Player> value) {
 

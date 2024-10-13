@@ -18,6 +18,8 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.*;
 
+import static hu.bgy.pokerapp.enums.Value.*;
+
 @RequiredArgsConstructor
 @Service
 public class TableServiceImpl implements TableService {
@@ -59,9 +61,17 @@ public class TableServiceImpl implements TableService {
             if (isEndOfTheGame(table)) {
                 return handleEndOfRound(table);
             }
-        }return table;
+        }
+        return table;
     }
 
+    private boolean combinationValue(Value valueOfInterest) {
+        return valueOfInterest == POKER ||
+                valueOfInterest == FULL_HOUSE ||
+                valueOfInterest == DRILL ||
+                valueOfInterest == TWO_PAIRS ||
+                valueOfInterest == PAIR;
+    }
 
     public Table handleEndOfRound(Table table) {
         List<List<Player>>  playersValues = seekingWinner(table);
@@ -71,7 +81,7 @@ public class TableServiceImpl implements TableService {
                     .map(Balance::getBet)
                     .max(Comparator.naturalOrder())
                     .orElseThrow(IllegalStateException::new);
-            while (BigDecimal.ZERO.compareTo(maximumBet) == 0) {
+            while (BigDecimal.ZERO.compareTo(maximumBet) < 0) {
                 BigDecimal minimumBet = entry.stream()
                         .map(Player::getBalance)
                         .map(Balance::getBet)
@@ -92,13 +102,6 @@ public class TableServiceImpl implements TableService {
             }
         }return table;
     }
-
-    //todo azonos kezeknél
-    private void splittingThePot(Table table, List<Player> winners) {
-        Set<Integer> cd = new HashSet<>();
-        cd.contains(1);
-    }
-
 
     public List<List<Player>>  seekingWinner(Table table) {
         Map<Value, List<Player>> results = new TreeMap<>();
@@ -128,55 +131,19 @@ public class TableServiceImpl implements TableService {
         return value;
     }
 
-    public List<Player> theBestValue(Table table, List<Player> players, Value value) {
-        List<Player> winner = new ArrayList<>();
-        switch (value) {
-            case ROYAL_FLUSH -> {
-                return players;
-            }
-            case POKER, FULL_HOUSE, DRILL, TWO_PAIRS, PAIR -> winner = highCombination(players, table);
-        }
-        return winner;
-    }
 
-    private List<Player> highCombination(List<Player> players, Table table) {
-        List<Player> winners = new ArrayList<>();
-        Map<Player, Map<Rank, Integer>> details = new HashMap<>();
-        for (Player player : players) {
-            Map<Rank, Integer> cards = fillRanks(player.getHand().getCards());
-            details.put(player, cards);
-        }
-        return winners;
-    }
 
-    public @NonNull Map<Rank, Integer> fillRanks(@NonNull final TreeSet<Card> cards) {
-        final Map<Rank, Integer> ranks = new HashMap<>();
-        cards.stream()
-                .map(Card::getRank)
-                .toList()
-                .forEach(rank -> fillMap(ranks, rank));
-        return ranks;
-    }
 
-    private <T extends Enum<T>> void fillMap(@NonNull final Map<T, Integer> map, @NonNull final T type) {
-        if (map.containsKey(type)) {
-            map.put(type, map.get(type) + 1);
-        } else {
-            map.put(type, 1);
-        }
-    }
 
     private List<Player> highCard(List<Player> players, Table table) {
         List<Player> winner = new ArrayList<>();
         for (Player player : players) {
-            if (winner.isEmpty()) {
-                winner.add(player);
-                continue;
-            }
             if (player.getHand().getCards().getFirst().getRank().isHigher(winner.getFirst().getHand().getCards().getFirst().getRank())) {
                 winner.clear();
                 winner.add(player);
             }
+            if (player.getHand().getCards().getFirst().getRank().equals(winner.getFirst().getHand().getCards().getFirst().getRank()))
+                winner.add(player);
         }
         return winner;
     }
@@ -235,6 +202,7 @@ public class TableServiceImpl implements TableService {
         return Optional.empty();
     }
 }
+
 // írd át ezt az egy metódust
 ///todo TESZTET a round role nextRole() metódusra SPRING
 //todo validáció kiegészítés (csak akkor lehessen az opciót alkalmazni ha tényleg jogos)

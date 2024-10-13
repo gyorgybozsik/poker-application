@@ -6,7 +6,10 @@ import hu.bgy.pokerapp.exceptions.ValidationException;
 import hu.bgy.pokerapp.models.*;
 import hu.bgy.pokerapp.services.poker.TableService;
 import lombok.RequiredArgsConstructor;
+import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
@@ -44,38 +47,98 @@ public class TableServiceImplTest {
             player.setTable(table);
         }
         return playerList;
-    }   private List<Player> fillPlayersList2(Table table, int playersNumber) {
+    }
+
+    private List<Player> fillPlayersList2(Table table, int playersNumber) {
         List<Player> playerList = new ArrayList<>();
-        for (int i = 0; i < 2; i++) {
+        for (int i = 0; i < playersNumber; i++) {
             String name = "Player" + " " + i;
             RoundRole[] roundRoles = RoundRole.values();
             final Player player = new Player(name, new BigDecimal(100), RoundRole.valueOf(String.valueOf(roundRoles[i])));
             player.setId(UUID.fromString(i + "a98bab1-30a8-44d2-9273-e863e9d5e48b"));
-            player.getBalance().setBet(new BigDecimal(10));
+            player.getBalance().setBet(new BigDecimal(20));
             playerList.add(player);
             player.setTable(table);
         }
         return playerList;
     }
 
-    //  private void getPair(Table table, int number){
-    //      Map<org.springframework.beans.factory.annotation.Value, List<Card>> series = new HashMap<>();
-    //      for (int i = 0; ) {
-    //          Rank[] ranks = Rank.values();
-    //      }
-    //      List<Card> pair = new ArrayList<>();
-    //      pair.add(card(Symbol.HEARTH, Rank.JACK));
-    //      pair.add(card(Symbol.SPADE, Rank.JACK));
-    //      cards.add(pair); pair.clear();
-    //      pair.add(card(Symbol.DIAMOND, Rank.JACK));
-    //      pair.add(card(Symbol.CLUB, Rank.JACK));
-    //      cards.add(pair); pair.clear();
-    //      pair.add(card(Symbol.DIAMOND, Rank.KING));
-    //      pair.add(card(Symbol.CLUB, Rank.KING));
-    //      cards.add(pair); pair.clear();
-    //      pair.add(card(Symbol.HEARTH, Rank.KING));
-    //      pair.add(card(Symbol.SPADE, Rank.KING));
-    //  }
+    private List<TreeSet<Card>> fillCombinations() {
+        List<TreeSet<Card>> combinations = new ArrayList<>();
+        TreeSet<Card> cards = new TreeSet<>();
+        cards.add(card(Symbol.HEARTH, Rank.ACE));
+        cards.add(card(Symbol.CLUB, Rank.SIX));
+        cards.add(card(Symbol.CLUB, Rank.EIGHT));
+        cards.add(card(Symbol.SPADE, Rank.TEN));
+        cards.add(card(Symbol.CLUB, Rank.TEN));
+        combinations.add(new TreeSet<>(cards));
+        cards.clear();
+
+        //todo 2pár ász-10
+        cards.add(card(Symbol.DIAMOND, Rank.ACE));
+        cards.add(card(Symbol.DIAMOND, Rank.SIX));
+        combinations.add(new TreeSet<>(cards));
+        cards.clear();
+        //todo 2pár ász-10       split
+        cards.add(card(Symbol.SPADE, Rank.ACE));
+        cards.add(card(Symbol.DIAMOND, Rank.EIGHT));
+        combinations.add(new TreeSet<>(cards));
+        cards.clear();
+        //todo drill Ász-8 magaslappal
+        cards.add(card(Symbol.HEARTH, Rank.TEN));
+        cards.add(card(Symbol.DIAMOND, Rank.TWO));
+        combinations.add(new TreeSet<>(cards));
+        cards.clear();
+        //todo drill Ász-Király magaslappal
+        cards.add(card(Symbol.DIAMOND, Rank.TEN));
+        cards.add(card(Symbol.CLUB, Rank.KING));
+        combinations.add(new TreeSet<>(cards));
+        cards.clear();
+        //todo sor
+        cards.add(card(Symbol.DIAMOND, Rank.SEVEN));
+        cards.add(card(Symbol.HEARTH, Rank.NINE));
+        combinations.add(new TreeSet<>(cards));
+        cards.clear();
+        //todo szín
+        cards.add(card(Symbol.CLUB, Rank.FIVE));
+        cards.add(card(Symbol.CLUB, Rank.FOUR));
+        combinations.add(new TreeSet<>(cards));
+        cards.clear();
+        //todo szín ász magaslappal
+        cards.add(card(Symbol.CLUB, Rank.TWO));
+        cards.add(card(Symbol.CLUB, Rank.ACE));
+        combinations.add(new TreeSet<>(cards));
+        cards.clear();
+        //todo 6-os full
+        cards.add(card(Symbol.SPADE, Rank.SIX));
+        cards.add(card(Symbol.HEARTH, Rank.SIX));
+        combinations.add(new TreeSet<>(cards));
+        cards.clear();
+        //todo 8-os full
+        cards.add(card(Symbol.SPADE, Rank.EIGHT));
+        cards.add(card(Symbol.HEARTH, Rank.EIGHT));
+        combinations.add(new TreeSet<>(cards));
+        cards.clear();
+        //todo színsor
+        cards.add(card(Symbol.CLUB, Rank.SEVEN));
+        cards.add(card(Symbol.CLUB, Rank.NINE));
+        combinations.add(new TreeSet<>(cards));
+        cards.clear();
+        return combinations;
+    }
+
+
+    private void handCombinationsForPlayers(Table table, int memberNeeded) {
+        List<TreeSet<Card>> combinations = fillCombinations();
+        table.setCards(setMaker(null, table, combinations.getFirst()));
+        combinations.removeFirst();
+        for (int i = 0; i < memberNeeded; i++) {
+            table.getSeats().get(i).setHand(new Hand(setMaker(table.getSeats().get(i), table, combinations.get(i))));
+        }
+
+
+    }
+
 
     private void fillUpGameWithCards(Table table) {
         TreeSet<Card> cards = new TreeSet<>();
@@ -166,14 +229,21 @@ public class TableServiceImplTest {
         return cards;
     }
 
+    @NotNull
+    private static Table getTable(int round) {
+        final Table table = new Table(TEXAS_HOLDEM, BigDecimal.TWO);
+        final UUID id = UUID.fromString("4a98bab1-30a8-44d2-9273-e863e9d5e48b");
+        table.setId(id);
+        table.setRound(round);
+        return table;
+    }
+
     //--------------------------------------------------------------------------------------------------------------
     @Test
     void performTableSpeakerFold() throws ValidationException {
         //Given - Arrange (a teszt futásához szükséges paraméterek és feltétlek megteremtése)
-        final Table table = new Table(TEXAS_HOLDEM, BigDecimal.TWO);
-        final UUID id = UUID.fromString("4a98bab1-30a8-44d2-9273-e863e9d5e48b");
-        table.setId(id);
-        table.setRound(0);
+        final Table table = getTable(0);
+
         //10 egységgel kezdtek a játékosok
         final Player gyuri = new Player("Gyuri", new BigDecimal(6), RoundRole.BIG_BLIND);
         gyuri.setId(UUID.fromString("8a98bab1-30a8-44d2-9273-e863e9d5e48b"));
@@ -203,10 +273,7 @@ public class TableServiceImplTest {
     @Test
     void getAllPokerTableValidationError() throws ValidationException {
         //Given - Arrange (a teszt futásához szükséges paraméterek és feltétlek megteremtése)
-        final Table table = new Table(TEXAS_HOLDEM, BigDecimal.TWO);
-        final UUID id = UUID.fromString("4a98bab1-30a8-44d2-9273-e863e9d5e48b");
-        table.setId(id);
-        table.setRound(0);
+        final Table table = getTable(0);
         //10 egységgel kezdtek a játékosok
         final Player gyuri = new Player("Gyuri", new BigDecimal(6), RoundRole.BIG_BLIND);
         UUID gyuriId = UUID.fromString("8a98bab1-30a8-44d2-9273-e863e9d5e48b");
@@ -226,50 +293,53 @@ public class TableServiceImplTest {
         assertThrows(ValidationException.class, () -> tableService.performTableSpeaker(table, speakerActionDTO));
     }
 
-    @Test
-    void handleEndOfRound() throws ValidationException {
-        final Table table = new Table(TEXAS_HOLDEM, BigDecimal.TWO);
-        final UUID id = UUID.fromString("4a98bab1-30a8-44d2-9273-e863e9d5e48b");
-        table.setId(id);
-        table.setRound(3);
-        final List<Player> seats = fillPlayersList2(table, 2);
-        table.setSeats(seats);
-        table.setSpeaker(RoundRole.SMALL_BLIND);
-        table.setAfterLast(RoundRole.SMALL_BLIND);
+    //@Test
+    @ParameterizedTest
+    @ValueSource(ints = {2, 3, 4, 5, 6, 7, 8, 9, 10})
+    void handleEndOfRound( int playersNumber ) throws ValidationException {
+            List<BigDecimal> testVariables = loadVariables(playersNumber);
+            final Table table = getTable(3);
+            final List<Player> seats = fillPlayersList2(table, playersNumber);
+            table.setSeats(seats);
+            table.setSpeaker(RoundRole.SMALL_BLIND);
+            table.setAfterLast(RoundRole.SMALL_BLIND);
 
-        TreeSet<Card> cards;
-        cards = getStraight();
-        table.setCards(setMaker(null, table, cards));
-        cards.clear();
-        cards.add(card(Symbol.CLUB, Rank.TEN));
-        cards.add(card(Symbol.SPADE, Rank.JACK));
-        table.getSeats().get(0).setHand(new Hand(setMaker(table.getSeats().get(0), table, cards)));
-        cards.clear();
-        cards.add(card(Symbol.DIAMOND, Rank.ACE));
-        cards.add(card(Symbol.CLUB, Rank.TWO));
-        table.getSeats().get(1).setHand(new Hand(setMaker(table.getSeats().get(1), table, cards)));
+            handCombinationsForPlayers(table, playersNumber);
 
-        Table resultTable = tableServiceImpl.handleEndOfRound(table);
-        assertEquals(new BigDecimal(120), resultTable.getSeats().get(0).getBalance().getCash());
-        assertEquals(new BigDecimal(100), resultTable.getSeats().get(1).getBalance().getCash());
-
-        //When - Act (ez a rész futtatja a tesztelendő metódust)
-        //  Table resultTable = tableService.handleEndOfRound(table, speakerActionDTO);
-        //  assertLinesMatch(5, 5);
+            Table resultTable = tableServiceImpl.handleEndOfRound(table);
+        IntStream.range(0, playersNumber).forEach(x -> {
+            BigDecimal expectedBalance = new BigDecimal(String.valueOf(testVariables.get(x))).setScale(2);
+            BigDecimal actualBalance = resultTable.getSeats().get(x).getBalance().getCash().setScale(2);
+            assertEquals(expectedBalance, actualBalance);
+        });
     }
+
+    private List<BigDecimal> loadVariables(int serialNumber) {
+        List<BigDecimal> testVariables = new ArrayList<>();
+        for (int i = 0; i < serialNumber; i++) {
+            int result = 100;
+            if (serialNumber == 2) result += 20;
+            if (i == serialNumber-1 && serialNumber != 2) result = result + (20 * serialNumber);
+            BigDecimal bigDecimalValue = new BigDecimal(result).setScale(2);
+            testVariables.add(bigDecimalValue);
+        }
+        return testVariables;
+    }
+
+    private void clearForNext(Table table) {
+        table.getSeats().clear();
+        table.getCards().clear();
+    }
+
 
     @Test
     void seekingWinner() throws ValidationException {
-        final Table table = new Table(TEXAS_HOLDEM, BigDecimal.TWO);
-        final UUID id = UUID.fromString("4a98bab1-30a8-44d2-9273-e863e9d5e48b");
-        table.setId(id);
-        table.setRound(3);
-
-        final List<Player> seats = fillPlayersList(table, 5, true);
+        final Table table = getTable(3);
+        final List<Player> seats = fillPlayersList(table, 10, true);
         table.setSeats(seats);
         table.setSpeaker(RoundRole.SMALL_BLIND);
         table.setAfterLast(RoundRole.SMALL_BLIND);
-        fillUpGameWithShareHands(table);
+        handCombinationsForPlayers(table, 10);
         tableServiceImpl.seekingWinner(table);
 
         //When - Act (ez a rész futtatja a tesztelendő metódust)
@@ -280,10 +350,7 @@ public class TableServiceImplTest {
 
     @Test
     void theBestValue() {
-        final Table table = new Table(TEXAS_HOLDEM, BigDecimal.TWO);
-        final UUID id = UUID.fromString("4a98bab1-30a8-44d2-9273-e863e9d5e48b");
-        table.setId(id);
-        table.setRound(3);
+        final Table table = getTable(3);
         List<Player> seats = fillPlayersList(table, 5, true);
         table.setSeats(seats);
         table.setSpeaker(RoundRole.SMALL_BLIND);
@@ -308,26 +375,57 @@ public class TableServiceImplTest {
         //assertEquals(playerY, winners.get(1));
     }
 
-    //  public static Stream<Arguments> getTest() {
-    //      return Stream.of(
-    //              Arguments.of(
-    //              Set.of(
-    //                      of(card(CLUB, ACE), card(DIAMOND, KING), card(DIAMOND, QUEEN), card(SPADE, JACK), card(SPADE, NINE))),
-    //              NOTHING,
-    //              of(card(SPADE, NINE), card(SPADE, JACK), card(DIAMOND, KING), card(DIAMOND, QUEEN), card(CLUB, TWO),
-    //                      card(SPADE, THREE), card(DIAMOND, FIVE), card(DIAMOND, EIGHT),
-    //                      card(CLUB, ACE), card(HEARTH, SEVEN)))
-//
-    //      );
-    //  }
-    //  @ParameterizedTest
-    //  @MethodSource(value = "getTest")
-    //  void testGetValue(final Map<Player, Value> expected, final Value value, final TreeSet<Card> cards) {
-    //      Set<TreeSet<Card>> handBasedOnValue = handValueService.getHandBasedOnValue(value, hand(cards));
-    //      assertTrue(handBasedOnValue.containsAll(expected));
-    //      assertEquals(expected, handBasedOnValue);
-    //  }
+    //private void kkk() {
+    //    cards.add(card(Symbol.HEARTH, Rank.ACE));
+    //    cards.add(card(Symbol.CLUB, Rank.SIX));
+    //    cards.add(card(Symbol.CLUB, Rank.EIGHT));
+    //    cards.add(card(Symbol.SPADE, Rank.TEN));
+    //    cards.add(card(Symbol.CLUB, Rank.TEN));
+    //    table.setCards(setMaker(null, table, cards));
+    //    cards.clear(); //todo 2pár ász-10
+    //    cards.add(card(Symbol.DIAMOND, Rank.ACE));
+    //    cards.add(card(Symbol.DIAMOND, Rank.SIX));
+    //    table.getSeats().get(0).setHand(new Hand(setMaker(table.getSeats().get(0), table, cards)));
+    //    cards.clear(); //todo 2pár ász-10
+    //    cards.add(card(Symbol.SPADE, Rank.ACE));
+    //    cards.add(card(Symbol.DIAMOND, Rank.EIGHT));
+    //    table.getSeats().get(1).setHand(new Hand(setMaker(table.getSeats().get(1), table, cards)));
+    //    cards.clear(); //todo drill Ász-8 magaslappal
+    //    cards.add(card(Symbol.HEARTH, Rank.TEN));
+    //    cards.add(card(Symbol.DIAMOND, Rank.TWO));
+    //    table.getSeats().get(2).setHand(new Hand(setMaker(table.getSeats().get(1), table, cards)));
+    //    cards.clear(); //todo drill Ász-Király magaslappal
+    //    cards.add(card(Symbol.DIAMOND, Rank.TEN));
+    //    cards.add(card(Symbol.CLUB, Rank.KING));
+    //    table.getSeats().get(3).setHand(new Hand(setMaker(table.getSeats().get(1), table, cards)));
+    //    cards.clear(); //todo sor
+    //    cards.add(card(Symbol.DIAMOND, Rank.SEVEN));
+    //    cards.add(card(Symbol.HEARTH, Rank.NINE));
+    //    table.getSeats().get(4).setHand(new Hand(setMaker(table.getSeats().get(1), table, cards)));
+    //    cards.clear(); //todo szín
+    //    cards.add(card(Symbol.CLUB, Rank.FIVE));
+    //    cards.add(card(Symbol.CLUB, Rank.FOUR));
+    //    table.getSeats().get(5).setHand(new Hand(setMaker(table.getSeats().get(1), table, cards)));
+    //    cards.clear(); //todo szín ász magaslappal
+    //    cards.add(card(Symbol.CLUB, Rank.TWO));
+    //    cards.add(card(Symbol.CLUB, Rank.ACE));
+    //    table.getSeats().get(6).setHand(new Hand(setMaker(table.getSeats().get(1), table, cards)));
+    //    cards.clear(); //todo 6-os full
+    //    cards.add(card(Symbol.SPADE, Rank.SIX));
+    //    cards.add(card(Symbol.HEARTH, Rank.SIX));
+    //    table.getSeats().get(7).setHand(new Hand(setMaker(table.getSeats().get(1), table, cards)));
+    //    cards.clear(); //todo 8-os full
+    //    cards.add(card(Symbol.SPADE, Rank.EIGHT));
+    //    cards.add(card(Symbol.HEARTH, Rank.EIGHT));
+    //    table.getSeats().get(8).setHand(new Hand(setMaker(table.getSeats().get(1), table, cards)));
+    //    cards.clear(); //todo színsor
+    //    cards.add(card(Symbol.CLUB, Rank.SEVEN));
+    //    cards.add(card(Symbol.CLUB, Rank.NINE));
+    //    table.getSeats().get(9).setHand(new Hand(setMaker(table.getSeats().get(1), table, cards)));
+    //    cards.clear();
+    //}
     public static Card card(final Symbol symbol, final Rank rank) {
         return new Card(UUID.fromString("4a98bab1-30a8-44d2-9273-e863e9d5e48b"), symbol, rank);
     }
+
 }

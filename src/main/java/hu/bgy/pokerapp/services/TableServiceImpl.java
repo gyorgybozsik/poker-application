@@ -3,7 +3,6 @@ package hu.bgy.pokerapp.services;
 import hu.bgy.pokerapp.components.TableValidator;
 import hu.bgy.pokerapp.dtos.SpeakerActionDTO;
 import hu.bgy.pokerapp.enums.PokerType;
-import hu.bgy.pokerapp.enums.Rank;
 import hu.bgy.pokerapp.enums.RoundRole;
 import hu.bgy.pokerapp.enums.Value;
 import hu.bgy.pokerapp.exceptions.ValidationException;
@@ -17,8 +16,7 @@ import org.springframework.stereotype.Service;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.*;
-
-import static hu.bgy.pokerapp.enums.Value.*;
+import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 @Service
@@ -65,15 +63,8 @@ public class TableServiceImpl implements TableService {
         return table;
     }
 
-    private boolean combinationValue(Value valueOfInterest) {
-        return valueOfInterest == POKER ||
-                valueOfInterest == FULL_HOUSE ||
-                valueOfInterest == DRILL ||
-                valueOfInterest == TWO_PAIRS ||
-                valueOfInterest == PAIR;
-    }
 
-    public Table handleEndOfRound(Table table) {
+    public Table handleEndOfRound(@NonNull Table table) {
         List<List<Player>>  playersValues = seekingWinner(table);
         for (List<Player>  entry : playersValues) {
             BigDecimal maximumBet = entry.stream()
@@ -97,16 +88,15 @@ public class TableServiceImpl implements TableService {
                 entry.forEach(player -> player.getBalance().addCash(distributeCash));
                 entry.removeIf(Player::hasNoBet);
                 maximumBet = maximumBet.subtract(minimumBet);
-
-                //todo teszteket készíteni
             }
         }return table;
     }
 
-    public List<List<Player>>  seekingWinner(Table table) {
+    public List<List<Player>>  seekingWinner(@NonNull Table table) {
         Map<Value, List<Player>> results = new TreeMap<>();
         List<Player> ultimatePlayers = table.getActivePlayers();
-        for (Player player : ultimatePlayers) {
+        ultimatePlayers
+                .forEach(player -> {
             Value value = makeFinalHandAndValue(player, table);
             if (results.containsKey(value)) {
                 results.get(value).add(player);
@@ -115,15 +105,17 @@ public class TableServiceImpl implements TableService {
                 next.add(player);
                 results.put(value, next);
             }
-        }
-        List<List<Player>> order = new ArrayList<>();
-        for (Map.Entry<Value, List<Player>> entry : results.entrySet()) {
-            order.addAll(handValueService.orderWithHighestCard(entry.getKey(), entry.getValue()));
-        }
+        });
+        List<List<Player>> order = results.entrySet()
+                .stream()
+                .flatMap(entry -> handValueService.orderWithHighestCard(entry.getKey(), entry.getValue()).stream())
+                .collect(Collectors.toList());
+
         return order;//todo magaslap elkezelés
     }
 
-    private Value makeFinalHandAndValue(Player player, Table table) {
+    private Value makeFinalHandAndValue(@NonNull Player player,
+                                        @NonNull Table table) {
         player.getHand().addCard(table.getCards());
         Value value = handValueService.evaluate(player.getHand());
         Set<Card> finalHand = handValueService.getValuesHand(player.getHand());
@@ -135,18 +127,7 @@ public class TableServiceImpl implements TableService {
 
 
 
-    private List<Player> highCard(List<Player> players, Table table) {
-        List<Player> winner = new ArrayList<>();
-        for (Player player : players) {
-            if (player.getHand().getCards().getFirst().getRank().isHigher(winner.getFirst().getHand().getCards().getFirst().getRank())) {
-                winner.clear();
-                winner.add(player);
-            }
-            if (player.getHand().getCards().getFirst().getRank().equals(winner.getFirst().getHand().getCards().getFirst().getRank()))
-                winner.add(player);
-        }
-        return winner;
-    }
+
 
 
     private Hand setMaker(Player player, final TreeSet<Card> cards) {

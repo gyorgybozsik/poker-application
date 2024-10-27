@@ -13,8 +13,10 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 import static hu.bgy.pokerapp.enums.Rank.ACE;
-import static hu.bgy.pokerapp.enums.Value.values;
+import static hu.bgy.pokerapp.enums.Value.*;
+import static hu.bgy.pokerapp.enums.Value.PAIR;
 import static java.util.Arrays.stream;
+
 @Service
 public class HandValueServiceImpl implements HandValueService {
     public @NonNull Value evaluate(@Nullable final Hand hand) {
@@ -39,36 +41,137 @@ public class HandValueServiceImpl implements HandValueService {
                 .findFirst()
                 .orElseThrow(IllegalArgumentException::new);
     }
-    private Player highCombination(List<Player> players, Table table) {
-        Player winner = null;
-        Value handValue = players.getFirst().getHand().getHandScore();
+
+    private static List<List<Player>> highSerial(@NonNull List<Player> playersWithSameValue) {
+        List<List<Player>> valuesInOrder = new ArrayList<>();
+        for (Player player : playersWithSameValue) {
+            if (valuesInOrder.isEmpty()) {
+                List<Player> serial = new ArrayList<>(Collections.singleton(player));
+            } else {
+                for (int i = 0; i < valuesInOrder.size(); i++) {
+
+                    if (valuesInOrder.get(i).getFirst().isThisHigherHandOrEqual(player, false)) {
+                        List<Player> newSerial = new ArrayList<>(Collections.singleton(player));
+                        valuesInOrder.add(i, newSerial);
+                        break;
+                    } else if (valuesInOrder.get(i).getFirst().isThisHigherHandOrEqual(player, true)) {
+                        valuesInOrder.get(i).add(player);
+                        break;
+                    } else if (i == valuesInOrder.size() - 1) {
+                        List<Player> newSerial = new ArrayList<>(Collections.singleton(player));
+                        valuesInOrder.add(newSerial);
+                    }
+                }
+            }
+        }
+        return valuesInOrder;
+    }
+
+    private boolean combinationValue(@NonNull Value valueOfInterest) {
+        return valueOfInterest == POKER ||
+                valueOfInterest == FULL_HOUSE ||
+                valueOfInterest == DRILL ||
+                valueOfInterest == TWO_PAIRS ||
+                valueOfInterest == PAIR;
+    }
+
+    private boolean isItHigherHand(@NonNull Player playerFromOrderedList,
+                                   @NonNull Map<Player,TreeMap<Rank,Integer>> details,
+                                   @NonNull  Player challengerPlayer) {
+        TreeMap<Rank, Integer> playerFromOrderedListRanks = details.get(playerFromOrderedList);
+        TreeMap<Rank, Integer> challengerPayersRanks = details.get(challengerPlayer);
+        if (combinationValue(playerFromOrderedList.getHand().getHandScore())) {
+            Value handValue = playerFromOrderedList
+                    .getHand()
+                    .getHandScore();
+            Integer key = getCompinationCardSize(handValue);
+            Rank fromListRank = getRankFromMap(playerFromOrderedListRanks, key);
+            Rank challengerRank = getRankFromMap(challengerPayersRanks, key);
+            if (challengerRank.isHigher(fromListRank)) return true;
+            if (challengerRank.equals(fromListRank) && handValue == FULL_HOUSE || handValue == TWO_PAIRS) {
+                playerFromOrderedListRanks.remove(fromListRank, key);
+                challengerPayersRanks.remove(challengerRank, key);
+                key = 2;
+                fromListRank = getRankFromMap(playerFromOrderedListRanks, key);
+                challengerRank = getRankFromMap(challengerPayersRanks, key);
+                if (challengerRank.isHigher(fromListRank)) return true;
+                if (handValue == FULL_HOUSE && challengerRank.equals(fromListRank)) return false;
+                playerFromOrderedListRanks.remove(fromListRank, key);
+                challengerPayersRanks.remove(challengerRank, key);
+            }
+        }
+        if (playerFromOrderedListRanks.equals(challengerPayersRanks)) return false;
+        int round = playerFromOrderedListRanks.size();
+        for (int i = 0; i < round; i++) {
+            Rank playerFromList = playerFromOrderedListRanks.firstEntry().getKey();
+            Rank playerWhoIsChallenge = challengerPayersRanks.firstEntry().getKey();
+            if (playerWhoIsChallenge.isHigher(playerFromList))
+                return true;
+            playerFromOrderedListRanks.pollFirstEntry();
+            challengerPayersRanks.pollFirstEntry();
+        }
+        return false;
+    }
+
+   @NonNull
+    private static Rank getRankFromMap(Map<Rank, Integer> playerFromOrderedListRanks, Integer key) {
+        return playerFromOrderedListRanks.entrySet()
+                .stream()
+                .filter(rankEntry -> rankEntry.getValue().equals(key))
+                .map(Map.Entry::getKey).findFirst().orElseThrow(IllegalStateException::new);
+    }
+
+    private List<List<Player>> highCombination(List<Player> players) {
+        List<Player> winner = new ArrayList<>();
+        Value handValue = players
+                .getFirst()
+                .getHand()
+                .getHandScore();
+        Integer key = getCompinationCardSize(handValue);
+
+        Map<Player, TreeMap<Rank, Integer>> details = new TreeMap<>();
+        players.forEach(player -> {
+            TreeMap<Rank, Integer> cards = fillRanks(player.getHand().getCards());
+            details.put(player, cards);
+        });
+//todo itt hagytam félbe-----
+
+        //       for (Map.Entry<Player, TreeMap<Rank, Integer>> playerEntry : details.entrySet()) {
+//
+        //           for (Map.Entry<Rank, Integer> rankEntry : playerEntry.getValue().entrySet()) {
+        //               if (rankEntry.getValue() == key && (bestRank == null || rankEntry.getKey().isHigher(bestRank))) {
+        //                   bestRank = rankEntry.getKey();
+        //               }
+        //               bestRank = rankEntry.getKey();
+        //               // winner = entry.getKey();
+        //           }
+        //       }
+               return Collections.singletonList(winner);
+    }
+
+    @org.jetbrains.annotations.Nullable
+    private static Integer getCompinationCardSize(Value handValue) {
         Integer key = null;
         switch (handValue) {
             case POKER -> key = 4;
             case FULL_HOUSE, DRILL -> key = 3;
             case PAIR, TWO_PAIRS -> key = 2;
         }
+        return key;
+    }
 
-        Map<Player, TreeMap<Rank, Integer>> details = new HashMap<>();
-        players.forEach(player -> {
-            TreeMap<Rank, Integer> cards = fillRanks(player.getHand().getCards());
-            details.put(player, cards);
-        });
-//todo itt hagytam félbe
-        for (Map.Entry<Player, TreeMap<Rank, Integer>> entry : details.entrySet()) {
-            Rank bestRank = null;
-            for (Map.Entry<Rank, Integer> rankEntry : entry.getValue().entrySet()) {
-                if (rankEntry.getValue() == key && (bestRank == null || rankEntry.getKey().isHigher(bestRank))) {
-                    bestRank = rankEntry.getKey();
-                }
-                bestRank = rankEntry.getKey();
-                winner = entry.getKey();
+    private List<Player> highCard(List<Player> players, Table table) {
+        List<Player> winner = new ArrayList<>();
+        for (Player player : players) {
+            if (player.getHand().getCards().getFirst().getRank().isHigher(winner.getFirst().getHand().getCards().getFirst().getRank())) {
+                winner.clear();
+                winner.add(player);
             }
-
+            if (player.getHand().getCards().getFirst().getRank().equals(winner.getFirst().getHand().getCards().getFirst().getRank()))
+                winner.add(player);
         }
         return winner;
     }
-
 
     public @NonNull TreeMap<Rank, Integer> fillRanks(@NonNull final TreeSet<Card> cards) {
         final TreeMap<Rank, Integer> ranks = new TreeMap<>();
@@ -86,12 +189,46 @@ public class HandValueServiceImpl implements HandValueService {
             map.put(type, 1);
         }
     }
-    @Override
-    public List<List<Player>> orderWithHighestCard(Value key, List<Player> value) {
 
-        //todo magaslap elkezelés
-        return List.of(value);
+
+    @Override
+    public List<List<Player>> orderWithHighestCard(Value value, List<Player> playersWithSameValue) {
+        List<List<Player>> valuesInOrder = new ArrayList<>();
+
+        Map<Player, TreeMap<Rank, Integer>> details = new HashMap<>();
+        playersWithSameValue.forEach(player -> {
+            TreeMap<Rank, Integer> cards = fillRanks(player.getHand().getCards());
+            details.put(player, cards);
+        });
+
+        for (Player challengerPlayer : playersWithSameValue) {
+            if (valuesInOrder.isEmpty()) {
+                List<Player> newSerial = new ArrayList<>(Collections.singleton(challengerPlayer));
+                valuesInOrder.add(newSerial);
+            } else {
+                int rounds = valuesInOrder.size();
+                for (int i = 0; i < rounds; i++) {
+                    Player playerFromOrderedList = valuesInOrder.get(i).getFirst();
+                    if (details.get(playerFromOrderedList).equals(details.get(challengerPlayer))) {
+                        valuesInOrder.get(i).add(challengerPlayer);
+                        break;
+                    }
+                    if (isItHigherHand(playerFromOrderedList, details, challengerPlayer)) {
+                        List<Player> newSerial = new ArrayList<>(Collections.singleton(challengerPlayer));
+                        valuesInOrder.add(i, newSerial);
+                        break;
+                    }
+                    if (i == valuesInOrder.size() - 1) {
+                        List<Player> newSerial = new ArrayList<>(Collections.singleton(challengerPlayer));
+                        valuesInOrder.add(newSerial);
+                        continue;
+                    }
+                }
+            }
+        }
+        return valuesInOrder;
     }
+
 
     @Override
     public @NonNull Set<TreeSet<Card>> getHandBasedOnValue(@NonNull final Value value, @NonNull final Hand hand) {
@@ -393,7 +530,7 @@ public class HandValueServiceImpl implements HandValueService {
             @NonNull final Map.Entry<List<Card>, Integer> entry) {
         final Set<TreeSet<Card>> result = new HashSet<>();
         final Set<TreeSet<Card>> variations = getVariations(entry);
-        if(previouses.isEmpty()){
+        if (previouses.isEmpty()) {
             return variations;
         }
 

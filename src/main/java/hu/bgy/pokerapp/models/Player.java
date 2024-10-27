@@ -7,7 +7,7 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.math.BigDecimal;
-import java.util.UUID;
+import java.util.*;
 
 @Getter
 @Setter
@@ -80,5 +80,19 @@ public class Player {
 
     public boolean hasNoBet() {
         return BigDecimal.ZERO.compareTo(this.getBalance().getBet()) == 0;
+    }
+
+    public boolean isThisHigherHandOrEqual(@NonNull Player player,
+                                           boolean isItAnEqualSerial) {
+        List<Card> actualBest = new ArrayList<>(this.getHand().getCards());
+        List<Card> challengingPlayer = new ArrayList<>(player.getHand().getCards());
+
+        for (int i = 0; i < 5; i++) {
+            if (actualBest.get(i).getRank().isHigher(challengingPlayer.get(i).getRank())) return true;
+            else if (actualBest.get(i).getRank().equals(challengingPlayer.get(i).getRank())) continue;
+            if (isItAnEqualSerial && i == 4) return true;
+            break;
+        }
+        return false;
     }
 }

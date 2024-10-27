@@ -6,6 +6,7 @@ import hu.bgy.pokerapp.exceptions.ValidationException;
 import hu.bgy.pokerapp.services.GameService;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
+import lombok.Value;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 
@@ -45,5 +46,10 @@ public class GameController {
     public TableDTO performTableSpeaker(@RequestBody SpeakerActionDTO speakerActionDTO,
                                         @PathVariable UUID tableId) throws ValidationException {
         return gameService.performTableSpeaker(speakerActionDTO, tableId);
+    }
+
+    @GetMapping(value = "/deal/table/{tableId}")
+    public TableDTO deal(@PathVariable final UUID tableId) {
+        return gameService.deal(tableId);
     }
 }

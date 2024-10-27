@@ -116,7 +116,7 @@ public class TableServiceImpl implements TableService {
 
     private Value makeFinalHandAndValue(@NonNull Player player,
                                         @NonNull Table table) {
-        player.getHand().addCard(table.getCards());
+        player.getHand().addCards(table.getCards());
         Value value = handValueService.evaluate(player.getHand());
         Set<Card> finalHand = handValueService.getValuesHand(player.getHand());
         player.getHand().throwCard(finalHand);

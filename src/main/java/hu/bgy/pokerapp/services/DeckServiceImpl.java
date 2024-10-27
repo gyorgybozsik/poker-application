@@ -44,13 +44,8 @@ public class DeckServiceImpl implements DeckService {
         final Set<Card> tableCards = table.getCardsForDeck();
         final Set<Card> playerCards = new HashSet<>();
         for (Player player : table.getSeats()) {
-           Optional<Hand> hand = Optional.ofNullable(player.getHand());
-            hand.ifPresentOrElse(
-                    (value) -> { playerCards.addAll(value.getCards());
-            },
-                    () -> {
-                    }
-            );
+            Optional<Hand> hand = Optional.ofNullable(player.getHand());
+            hand.ifPresent((value) -> playerCards.addAll(value.getCards()));
         }
 
         return new Deck(allCard, tableCards, playerCards);

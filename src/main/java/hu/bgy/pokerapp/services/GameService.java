@@ -17,4 +17,6 @@ public interface GameService {
     TableDTO loadGame(UUID tableId);
 
     TableDTO performTableSpeaker(SpeakerActionDTO speakerActionDTO, UUID tableId) throws ValidationException;
+
+    TableDTO deal(UUID tableId);
 }

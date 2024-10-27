@@ -4,13 +4,12 @@ import jakarta.persistence.*;
 import lombok.Data;
 import lombok.ToString;
 
-import java.io.Serializable;
-import java.util.UUID;
-
 @Entity
 @jakarta.persistence.Table(name = "card_owners")
 @Data
 public class CardOwner {
+
+
     @Embeddable
     @Data
     public static class CardOwnerId implements Serializable {

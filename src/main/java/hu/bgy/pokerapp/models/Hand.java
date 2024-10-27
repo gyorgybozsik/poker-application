@@ -40,8 +40,11 @@ public class Hand {
        // validate();
     }
 
-    public void addCard(Set<CardOwner> cardOwner) {
+    public void addCards(Set<CardOwner> cardOwner) {
         cardOwners.addAll(cardOwner);
+    }
+    public void addCard(Card card) {
+        cardOwners.add(new CardOwner(card, this, null));
     }
     public void throwCard(Set<Card> cards) {
         cardOwners.removeIf(cardOwner -> !cards.contains(cardOwner.getCard()));

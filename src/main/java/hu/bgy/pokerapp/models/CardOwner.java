@@ -1,39 +1,33 @@
 package hu.bgy.pokerapp.models;
 
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
 
-import java.io.Serializable;
 import java.util.UUID;
 
 @Entity
-@IdClass(CardOwner.CardOwnerId.class)
-@jakarta.persistence.Table(name = "card_owners")
+@jakarta.persistence.Table(name = "card_owners", uniqueConstraints = {@UniqueConstraint(columnNames = {"card_id", "table_id", "hand_id"})})
 @Data
 @EqualsAndHashCode
 public class CardOwner {
 
-
-    @Data
-    @AllArgsConstructor
-    @NoArgsConstructor
-    public static class CardOwnerId implements Serializable {
-        private UUID cardId;
-        private UUID tableId;
-        private UUID handId;
-    }
-
     @Id
-    @Column(name = "card_id", nullable = false)
-    private UUID cardId;
+    @GeneratedValue(strategy = GenerationType.UUID)
+    private UUID id;
 
-    @Id
-    @Column(name = "table_id", nullable = true)
-    private UUID tableId;
+ //  @Id
+ //  @Column(name = "card_id", nullable = false)
+ //  private UUID cardId;
 
-    @Id
-    @Column(name = "hand_id")
-    private UUID handId;
+ //  @Id
+ //  @Column(name = "table_id", nullable = true)
+ //  private UUID tableId;
+
+ //  @Id
+ //  @Column(name = "hand_id")
+ //  private UUID handId;
 
     @ManyToOne(fetch = FetchType.EAGER)
     @EqualsAndHashCode.Exclude

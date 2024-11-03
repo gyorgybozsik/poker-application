@@ -36,7 +36,7 @@ public class Table {
     @Column(name = "small_blind", nullable = false)
     private BigDecimal smallBlind;
 
-    @OneToMany(mappedBy = "table", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "table", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     private List<Player> seats;
 
     @Enumerated(EnumType.STRING)

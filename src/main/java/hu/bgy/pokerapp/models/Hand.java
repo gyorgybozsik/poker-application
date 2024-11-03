@@ -49,17 +49,12 @@ public class Hand {
 
     public void addCard(Card card) {
         CardOwner cardOwner = new CardOwner();
-        CardOwner.CardOwnerId id = new CardOwner.CardOwnerId();
 
-        id.setCardId(card.getId());
-        id.setHandId(this.getId());
-        id.setTableId(null);
+
+
         cardOwner.setCard(card);
         cardOwner.setHand(this);
         cardOwner.setTable(null);
-        cardOwner.setCardId(card.getId());
-        cardOwner.setHandId(this.id);
-        cardOwner.setTableId(null);
         cardOwners.add(cardOwner);
     }
 

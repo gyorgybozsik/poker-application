@@ -8,13 +8,16 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 
-import java.util.*;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.TreeSet;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 import static org.springframework.util.CollectionUtils.isEmpty;
 
 @Entity
-@Table (name = "hands")
+@Table(name = "hands")
 @NoArgsConstructor(access = AccessLevel.PUBLIC)
 @Data
 public class Hand {
@@ -23,7 +26,7 @@ public class Hand {
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
-    @OneToMany
+    @OneToMany(mappedBy = "hand", cascade = CascadeType.ALL)
     private Set<CardOwner> cardOwners = new HashSet<>();
 
     @OneToOne(cascade = CascadeType.ALL)
@@ -37,15 +40,29 @@ public class Hand {
 
     public Hand(final TreeSet<CardOwner> cardOwners) {
         this.cardOwners = cardOwners;
-       // validate();
+        // validate();
     }
 
     public void addCards(Set<CardOwner> cardOwner) {
         cardOwners.addAll(cardOwner);
     }
+
     public void addCard(Card card) {
-        cardOwners.add(new CardOwner(card, this, null));
+        CardOwner cardOwner = new CardOwner();
+        CardOwner.CardOwnerId id = new CardOwner.CardOwnerId();
+
+        id.setCardId(card.getId());
+        id.setHandId(this.getId());
+        id.setTableId(null);
+        cardOwner.setCard(card);
+        cardOwner.setHand(this);
+        cardOwner.setTable(null);
+        cardOwner.setCardId(card.getId());
+        cardOwner.setHandId(this.id);
+        cardOwner.setTableId(null);
+        cardOwners.add(cardOwner);
     }
+
     public void throwCard(Set<Card> cards) {
         cardOwners.removeIf(cardOwner -> !cards.contains(cardOwner.getCard()));
     }

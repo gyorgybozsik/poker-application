@@ -2,10 +2,7 @@ package hu.bgy.pokerapp.mappers;
 
 import hu.bgy.pokerapp.dtos.*;
 import hu.bgy.pokerapp.enums.RoundRole;
-import hu.bgy.pokerapp.models.Balance;
-import hu.bgy.pokerapp.models.Player;
-import hu.bgy.pokerapp.models.PlayerState;
-import hu.bgy.pokerapp.models.Table;
+import hu.bgy.pokerapp.models.*;
 import lombok.NonNull;
 import org.springframework.stereotype.Component;
 
@@ -52,6 +49,7 @@ public class GameMapperImpl implements GameMapper {
         return new TableDTO(table.getId(),
                 table.getRound(),
                 table.getSpeaker(),
+                mapCardsToCardsDTOs(table.getCards().stream().map(CardOwner::getCard).collect(Collectors.toSet())),
                 table.getPokerType(),
                 table.getSmallBlind(),
                 mapPlayersToPlayerDTOs(table.getSeats()));
@@ -68,7 +66,15 @@ public class GameMapperImpl implements GameMapper {
                 player.getId(),
                 player.getName(),
                 mapBalanceToBalanceDTO(player.getBalance()),
+                mapCardsToCardsDTOs(player.getHand().getCards()),
                 mapPlayerStateToPlayerStateDTO(player.getState()));
+    }
+
+    private Set<CardDTO> mapCardsToCardsDTOs(Set<Card> cards) {
+        return cards
+                .stream()
+                .map(card -> new CardDTO(card.getRank(), card.getSymbol()))
+                .collect(Collectors.toSet());
     }
 
     private PlayerStateDTO mapPlayerStateToPlayerStateDTO(PlayerState playerState) {

@@ -70,11 +70,12 @@ CREATE TABLE hands
 
 CREATE TABLE card_owners
 (
+    id uuid DEFAULT uuid_generate_v4() PRIMARY KEY NOT NULL,
     card_id   uuid NOT NULL,
-    table_id  uuid NULL,
-    player_id uuid NULL,
-    PRIMARY KEY (card_id, table_id, player_id),
+    table_id  uuid ,
+    hand_id uuid ,
+
     constraint co_card_id_to_c_id foreign key (card_id) references cards (id),
     constraint co_table_id_to_t_id foreign key (table_id) references tables (id),
-    constraint co_player_id_to_p_id foreign key (player_id) references players (id)
+    constraint co_hand_id_to_h_id foreign key (hand_id) references hands (id)
 );

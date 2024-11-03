@@ -30,7 +30,7 @@ public class Player {
     @JoinColumn(name = "balance_id", referencedColumnName = "id", nullable = false)
     private Balance balance;
 
-    @OneToOne(mappedBy = "player")
+    @OneToOne(mappedBy = "player", cascade = CascadeType.ALL)
     private Hand hand;
 
     @OneToOne(mappedBy = "player", cascade = CascadeType.ALL)
@@ -49,6 +49,8 @@ public class Player {
         this.balance = new Balance(cash);
         balance.setPlayer(this);
         state = new PlayerState(this, roundRole);
+        hand = new Hand();
+        hand.setPlayer(this);
     }
 
     public boolean isSpeakable(@NonNull final RoundRole role) {

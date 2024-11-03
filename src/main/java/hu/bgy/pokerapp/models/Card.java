@@ -13,6 +13,7 @@ import java.util.UUID;
 @RequiredArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @Getter
+@EqualsAndHashCode
 public class Card implements Comparable<Card> {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)

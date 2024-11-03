@@ -51,7 +51,7 @@ public class Table {
         this.cards = cards;
     }
 
-    @OneToMany
+    @OneToMany (mappedBy = "table")
  //   @JoinTable(
  //           name = "card_owners",
  //           joinColumns = @JoinColumn(name = "table_id"),

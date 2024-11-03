@@ -43,9 +43,11 @@ public class GameServiceImpl implements GameService {
         Table table = tableRepo.getReferenceById(tableId);
         //todo add validation hogy ez a 0. kör -e és még nincsenek kiosztott lapok
         for (Player player : table.getSeats()) {
-            player.getHand().getCards().
+            player.getHand().addCard(deckService.draw(table));
+            player.getHand().addCard(deckService.draw(table));
         }
-        return null;
+        table = tableRepo.save(table);
+        return gameMapper.mapTableToTableDTO(table);
     }
 
     @Override

@@ -39,6 +39,8 @@ public class DeckServiceImpl implements DeckService {
         return draw(remainingDeck);
     }
 
+
+
     public @NonNull Deck remainingDeck(final @NonNull Table table) {
         final List<Card> allCard = cardRepo.findAll();
         final Set<Card> tableCards = table.getCardsForDeck();
@@ -47,7 +49,6 @@ public class DeckServiceImpl implements DeckService {
             Optional<Hand> hand = Optional.ofNullable(player.getHand());
             hand.ifPresent((value) -> playerCards.addAll(value.getCards()));
         }
-
         return new Deck(allCard, tableCards, playerCards);
     }
 }

@@ -59,6 +59,13 @@ public class Table {
  //   )
     private Set<CardOwner> cards = new HashSet<>();
 
+    public void addCard(Card card) {
+        CardOwner cardOwner = new CardOwner();
+        cardOwner.setCard(card);
+        cardOwner.setHand(null);
+        cardOwner.setTable(this);
+        cards.add(cardOwner);
+    }
     public void setSeats(List<Player> seats) {
         this.seats = seats;
         if (seats.size() == 2) {

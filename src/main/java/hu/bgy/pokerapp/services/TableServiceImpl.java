@@ -23,7 +23,7 @@ import java.util.stream.Collectors;
 public class TableServiceImpl implements TableService {
     private final HandValueService handValueService;
     private final TableValidator tableValidator;
-
+    private final DeckServiceImpl deckService;
     final Set<Poker> pokerKinds;
 
     private Poker getPokerKind(final @NonNull PokerType pokerType) {
@@ -31,6 +31,8 @@ public class TableServiceImpl implements TableService {
         if (pokers.size() != 1) throw new IllegalStateException();
         return pokers.getFirst();
     }
+
+    //todo kártya osztás asztalra és mentés
 
     @Override
     public @NonNull Table performTableSpeaker(@NonNull Table table, @NonNull SpeakerActionDTO speakerActionDTO) throws ValidationException {
@@ -56,17 +58,28 @@ public class TableServiceImpl implements TableService {
         if (roundRole.isPresent()) {
             table.setSpeaker(roundRole.get());
         } else {
-            if (isEndOfTheGame(table)) {
+            if (isEndOfTheRound(table)) {
                 return handleEndOfRound(table);
+            }
+            else {
+                handleNextPartOfTheRound(table);
             }
         }
         return table;
     }
+//todo a kódban lévő elnevezések rendszerezése és séma szerinti átnevezése
+    private void handleNextPartOfTheRound(Table table) {
+        table.setRound(table.getRound() + 1);
+        RoundRole firstSpeaker = getFirstSpeaker(table);
+        table.setSpeaker(firstSpeaker);
+        table.setAfterLast(firstSpeaker);
+        table = drawCardsForTable(table);
+    }
 
 
     public Table handleEndOfRound(@NonNull Table table) {
-        List<List<Player>>  playersValues = seekingWinner(table);
-        for (List<Player>  entry : playersValues) {
+        List<List<Player>> playersValues = seekingWinner(table);
+        for (List<Player> entry : playersValues) {
             BigDecimal maximumBet = entry.stream()
                     .map(Player::getBalance)
                     .map(Balance::getBet)
@@ -89,23 +102,24 @@ public class TableServiceImpl implements TableService {
                 entry.removeIf(Player::hasNoBet);
                 maximumBet = maximumBet.subtract(minimumBet);
             }
-        }return table;
+        }
+        return table;
     }
 
-    public List<List<Player>>  seekingWinner(@NonNull Table table) {
+    public List<List<Player>> seekingWinner(@NonNull Table table) {
         Map<Value, List<Player>> results = new TreeMap<>();
         List<Player> ultimatePlayers = table.getActivePlayers();
         ultimatePlayers
                 .forEach(player -> {
-            Value value = makeFinalHandAndValue(player, table);
-            if (results.containsKey(value)) {
-                results.get(value).add(player);
-            } else {
-                List<Player> next = new ArrayList<>();
-                next.add(player);
-                results.put(value, next);
-            }
-        });
+                    Value value = makeFinalHandAndValue(player, table);
+                    if (results.containsKey(value)) {
+                        results.get(value).add(player);
+                    } else {
+                        List<Player> next = new ArrayList<>();
+                        next.add(player);
+                        results.put(value, next);
+                    }
+                });
         List<List<Player>> order = results.entrySet()
                 .stream()
                 .flatMap(entry -> handValueService.orderWithHighestCard(entry.getKey(), entry.getValue()).stream())
@@ -123,37 +137,37 @@ public class TableServiceImpl implements TableService {
         return value;
     }
 
+private static TreeSet<CardOwner> setMaker(final TreeSet<Card> cards) {
+    TreeSet<CardOwner> cardO = new TreeSet<>(Comparator.comparing(CardOwner::getCard));
+    cards.forEach(card -> {
+        CardOwner e = new CardOwner();
+        e.setCard(card);
+        cardO.add(e);
+    });
+    return cardO;
+}
 
-
-
-
-
-
-
-    private Hand setMaker(Player player, final TreeSet<Card> cards) {
-        final TreeSet<CardOwner> cardO = new TreeSet<>(Comparator.comparing(CardOwner::getCard));
-        cards.forEach(card -> {
-            CardOwner e = new CardOwner();
-            e.setCard(card);
-            cardO.add(e);
-        });
-        return new Hand(cardO);
-    }
 
     //todo majd imp
-    private boolean isEndOfTheGame(Table table) {
-        if (table.getRound() == 3) {
-            return true;
+    private boolean isEndOfTheRound(Table table) {
+        return table.getRound() == 3;
+    }
+
+    public Table drawCardsForTable(Table table) {
+        int cardsSize = 0;
+        if (table.getRound() == 1) cardsSize = 3;
+        else if (table.getRound() > 1) cardsSize = 1;
+
+        for (int i = 0; i < cardsSize; i++) {
+            Card draw = deckService.draw(table);
+            table.addCard(draw);
         }
-        table.setRound(table.getRound() + 1);
-        RoundRole firstSpeaker = getFirstSpeaker(table);
-        table.setSpeaker(firstSpeaker);
-        table.setAfterLast(firstSpeaker);
-        return false;
+        return table;
     }
 
     private RoundRole getFirstSpeaker(Table table) {
-        for (RoundRole speaker : RoundRole.values()) {
+        RoundRole[] values = RoundRole.values();
+        for (RoundRole speaker : values) {
             final RoundRole role = speaker;
             if (table.getSeats().stream().anyMatch(player -> player.isSpeakable(role))) {
                 return speaker;

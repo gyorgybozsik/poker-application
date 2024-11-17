@@ -50,6 +50,10 @@ public class GameServiceImpl implements GameService {
         return gameMapper.mapTableToTableDTO(table);
     }
 
+    public void dealForTable(boolean isItFlop, Table table) {
+
+    }
+
     @Override
     public TableDTO loadGame(UUID tableId) {
         return gameMapper.mapTableToTableDTO(tableRepo.getReferenceById(tableId));

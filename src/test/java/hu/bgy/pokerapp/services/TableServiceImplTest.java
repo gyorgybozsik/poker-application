@@ -17,6 +17,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 
 import java.math.BigDecimal;
 import java.util.*;
+import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
@@ -213,7 +214,6 @@ public class TableServiceImplTest {
         TreeSet<CardOwner> cardO = new TreeSet<>(Comparator.comparing(CardOwner::getCard));
         cards.forEach(card -> {
             CardOwner e = new CardOwner();
-            e.setPlayer(player);
             e.setTable(table);
             e.setCard(card);
             cardO.add(e);
@@ -331,44 +331,44 @@ public class TableServiceImplTest {
 
     private static Stream<Arguments> handleEndOfRoundCases() {
         return Stream.of(
-                  Arguments.of(
-                          List.of( //todo 2 alsó és egy felső sor
-                                  creatPlayer(Set.of(card(DIAMOND, TWO), card(DIAMOND, SEVEN)), 100, 20, RoundRole.BIG_BLIND),
-                                  creatPlayer(Set.of(card(SPADE, ACE), card(CLUB, SEVEN)), 100, 20, RoundRole.SMALL_BLIND),
-                                  creatPlayer(Set.of(card(HEARTH, JACK), card(HEARTH, SEVEN)), 100, 20, RoundRole.SPEAKER_1)),
+                Arguments.of(
+                        List.of( //todo 2 alsó és egy felső sor
+                                creatPlayer(Set.of(card(DIAMOND, TWO), card(DIAMOND, SEVEN)), 100, 20, RoundRole.BIG_BLIND),
+                                creatPlayer(Set.of(card(SPADE, ACE), card(CLUB, SEVEN)), 100, 20, RoundRole.SMALL_BLIND),
+                                creatPlayer(Set.of(card(HEARTH, JACK), card(HEARTH, SEVEN)), 100, 20, RoundRole.SPEAKER_1)),
 
-                          Set.of(card(HEARTH, TEN), card(CLUB, SIX), card(CLUB, EIGHT), card(SPADE, NINE), card(CLUB, TWO)),
-                          List.of(
-                                  Balance.builder().cash(new BigDecimal("100")).bet(new BigDecimal("0")).build(),
-                                  Balance.builder().cash(new BigDecimal("100")).bet(new BigDecimal("0")).build(),
-                                  Balance.builder().cash(new BigDecimal("160.00")).bet(new BigDecimal("0")).build())
-                  ),
-                  Arguments.of(
-                          List.of( //todo 2db 2 pár és egy drill
-                                  creatPlayer(Set.of(card(DIAMOND, ACE), card(DIAMOND, SIX)), 100, 20, RoundRole.BIG_BLIND),
-                                  creatPlayer(Set.of(card(SPADE, ACE), card(DIAMOND, EIGHT)), 100, 20, RoundRole.SMALL_BLIND),
-                                  creatPlayer(Set.of(card(HEARTH, TEN), card(DIAMOND, TWO)), 100, 20, RoundRole.SPEAKER_1)),
+                        Set.of(card(HEARTH, TEN), card(CLUB, SIX), card(CLUB, EIGHT), card(SPADE, NINE), card(CLUB, TWO)),
+                        List.of(
+                                Balance.builder().cash(new BigDecimal("100")).bet(new BigDecimal("0")).build(),
+                                Balance.builder().cash(new BigDecimal("100")).bet(new BigDecimal("0")).build(),
+                                Balance.builder().cash(new BigDecimal("160.00")).bet(new BigDecimal("0")).build())
+                ),
+                Arguments.of(
+                        List.of( //todo 2db 2 pár és egy drill
+                                creatPlayer(Set.of(card(DIAMOND, ACE), card(DIAMOND, SIX)), 100, 20, RoundRole.BIG_BLIND),
+                                creatPlayer(Set.of(card(SPADE, ACE), card(DIAMOND, EIGHT)), 100, 20, RoundRole.SMALL_BLIND),
+                                creatPlayer(Set.of(card(HEARTH, TEN), card(DIAMOND, TWO)), 100, 20, RoundRole.SPEAKER_1)),
 
-                          Set.of(card(HEARTH, ACE), card(CLUB, SIX), card(CLUB, EIGHT), card(SPADE, TEN), card(CLUB, TEN)),
-                          List.of(
-                                  Balance.builder().cash(new BigDecimal("100")).bet(new BigDecimal("0")).build(),
-                                  Balance.builder().cash(new BigDecimal("100")).bet(new BigDecimal("0")).build(),
-                                  Balance.builder().cash(new BigDecimal("160.00")).bet(new BigDecimal("0")).build())
-                  ),
-                  Arguments.of(
-                          List.of( //todo 3DB 2 PÁR AMELYBŐL EGY NYERTES ÉS EZEK FELETTE JÁTSZANAK A TÉNYLEGES NYERTES DRILLNEK
-                                  creatPlayer(Set.of(card(DIAMOND, ACE), card(DIAMOND, SIX)), 1000, 100, RoundRole.BIG_BLIND),
-                                  creatPlayer(Set.of(card(CLUB, ACE), card(HEARTH, SIX)), 1000, 100, RoundRole.BIG_BLIND),
-                                  creatPlayer(Set.of(card(SPADE, ACE), card(SPADE, TEN)), 1000, 100, RoundRole.BIG_BLIND),
-                                  creatPlayer(Set.of(card(HEARTH, EIGHT), card(DIAMOND, EIGHT)), 0, 50, RoundRole.SPEAKER_1)),
+                        Set.of(card(HEARTH, ACE), card(CLUB, SIX), card(CLUB, EIGHT), card(SPADE, TEN), card(CLUB, TEN)),
+                        List.of(
+                                Balance.builder().cash(new BigDecimal("100")).bet(new BigDecimal("0")).build(),
+                                Balance.builder().cash(new BigDecimal("100")).bet(new BigDecimal("0")).build(),
+                                Balance.builder().cash(new BigDecimal("160.00")).bet(new BigDecimal("0")).build())
+                ),
+                Arguments.of(
+                        List.of( //todo 3DB 2 PÁR AMELYBŐL EGY NYERTES ÉS EZEK FELETTE JÁTSZANAK A TÉNYLEGES NYERTES DRILLNEK
+                                creatPlayer(Set.of(card(DIAMOND, ACE), card(DIAMOND, SIX)), 1000, 100, RoundRole.BIG_BLIND),
+                                creatPlayer(Set.of(card(CLUB, ACE), card(HEARTH, SIX)), 1000, 100, RoundRole.BIG_BLIND),
+                                creatPlayer(Set.of(card(SPADE, ACE), card(SPADE, TEN)), 1000, 100, RoundRole.BIG_BLIND),
+                                creatPlayer(Set.of(card(HEARTH, EIGHT), card(DIAMOND, EIGHT)), 0, 50, RoundRole.SPEAKER_1)),
 
-                          Set.of(card(HEARTH, ACE), card(CLUB, SIX), card(CLUB, EIGHT), card(SPADE, TWO), card(CLUB, TEN)),
-                          List.of(
-                                  Balance.builder().cash(new BigDecimal("1000")).bet(new BigDecimal("0")).build(),
-                                  Balance.builder().cash(new BigDecimal("1000")).bet(new BigDecimal("0")).build(),
-                                  Balance.builder().cash(new BigDecimal("1150.00")).bet(new BigDecimal("0")).build(),
-                                  Balance.builder().cash(new BigDecimal("200.00")).bet(new BigDecimal("0")).build())
-                  ),
+                        Set.of(card(HEARTH, ACE), card(CLUB, SIX), card(CLUB, EIGHT), card(SPADE, TWO), card(CLUB, TEN)),
+                        List.of(
+                                Balance.builder().cash(new BigDecimal("1000")).bet(new BigDecimal("0")).build(),
+                                Balance.builder().cash(new BigDecimal("1000")).bet(new BigDecimal("0")).build(),
+                                Balance.builder().cash(new BigDecimal("1150.00")).bet(new BigDecimal("0")).build(),
+                                Balance.builder().cash(new BigDecimal("200.00")).bet(new BigDecimal("0")).build())
+                ),
                 Arguments.of(
                         List.of( //todo LEGALJA SPLIT
                                 creatPlayer(Set.of(card(DIAMOND, ACE), card(DIAMOND, SIX)), 0, 500, RoundRole.BIG_BLIND),
@@ -471,6 +471,44 @@ public class TableServiceImplTest {
 
         //  Table resultTable = tableService.handleEndOfRound(table, speakerActionDTO);
         //  assertLinesMatch(5, 5);
+    }
+
+    @Test
+    void drawCardsForTable() {
+        Set<Card> cards = new HashSet<>();
+         Table table = getTable(0);
+        table.setSeats(List.of());
+        table.setSpeaker(RoundRole.SMALL_BLIND);
+        table.setAfterLast(RoundRole.SMALL_BLIND);
+        while (table.getRound() < 4) {
+           table = tableServiceImpl.drawCardsForTable(table);
+            switch (table.getRound()) {
+                case 0 -> assertEquals(0, table.getCards().size());
+                case 1 -> assertEquals(3, table.getCards().size());
+                case 2 -> assertEquals(4, table.getCards().size());
+                case 3 -> assertEquals(5, table.getCards().size());
+            }
+            Set<Card> newStateOfCards = table.getCards().stream().map(CardOwner::getCard).collect(Collectors.toSet());
+            assertTrue(newStateOfCards.containsAll(cards));
+            cards.addAll(newStateOfCards);
+            table.setRound(table.getRound()+1);
+        }
+
+    }
+
+    @ParameterizedTest
+    @ValueSource(ints = {0, 1, 2, 3})
+    void drawCardsForTable2(final int round) {
+        final Table table = getTable(round);
+        table.setSeats(List.of());
+        table.setSpeaker(RoundRole.SMALL_BLIND);
+        table.setAfterLast(RoundRole.SMALL_BLIND);
+        tableServiceImpl.drawCardsForTable(table);
+        switch (round) {
+            case 0 -> assertEquals(0, table.getCards().size());
+            case 1 -> assertEquals(3, table.getCards().size());
+            case 2, 3 -> assertEquals(1, table.getCards().size());
+        }
     }
 
     @Test

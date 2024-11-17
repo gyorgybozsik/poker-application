@@ -17,20 +17,8 @@ public class CardOwner {
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
- //  @Id
- //  @Column(name = "card_id", nullable = false)
- //  private UUID cardId;
-
- //  @Id
- //  @Column(name = "table_id", nullable = true)
- //  private UUID tableId;
-
- //  @Id
- //  @Column(name = "hand_id")
- //  private UUID handId;
-
     @ManyToOne(fetch = FetchType.EAGER)
-    @EqualsAndHashCode.Exclude
+    //@EqualsAndHashCode.Exclude
     @ToString.Exclude
     @JoinColumn(name = "card_id", insertable = false, updatable = false)
     private Card card;

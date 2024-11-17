@@ -49,9 +49,6 @@ public class Hand {
 
     public void addCard(Card card) {
         CardOwner cardOwner = new CardOwner();
-
-
-
         cardOwner.setCard(card);
         cardOwner.setHand(this);
         cardOwner.setTable(null);
